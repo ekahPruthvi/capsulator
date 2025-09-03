@@ -254,18 +254,22 @@ fn build_ui(app: &Application) {
                 retro-glow-loop 2s cubic-bezier(0.6,0,0.4,1) forwards;
         }
 
-        label.text {
-            font-family: 'Orbitron', 'Segoe UI', monospace;
-            font-weight: bold;
-            letter-spacing: 2.5px;
-            line-height: 0.8;
-            font-size: 22px;
+        #heading {
+            font-size: 28px;
+            font-weight: 900;
         }
 
         #mainbox {
             border-radius: 25px;
             border: 1px solid rgba(255, 255, 255, 0.16);
-            background-color: rgba(31, 51, 38, 0.56);
+            background-color: rgba(40, 54, 45, 0.32);
+            padding: 30px 30px 30px 30px;
+        }
+
+        #inbox {
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background-color: rgba(49, 49, 49, 0.56);
             padding: 30px 30px 30px 30px;
         }
 
@@ -299,6 +303,8 @@ fn build_ui(app: &Application) {
     main_box.set_visible(false);
 
     let stack = Stack::builder()
+        .hexpand(true)
+        .vexpand(true)
         .transition_type(gtk4::StackTransitionType::Crossfade)
         .build();
     // let click = Rc::new(Cell::new(0));
@@ -307,11 +313,21 @@ fn build_ui(app: &Application) {
     stack_box.set_vexpand(true);
 
     let wifibox = GtkBox::new(Orientation::Vertical, 5);
-    wifibox.append(&Label::new(Some("Internet Connection Required")));
+    wifibox.set_widget_name("inbox");
+    wifibox.set_vexpand(false);
+    wifibox.set_hexpand(false);
+    wifibox.set_size_request(500, 500);
+    wifibox.set_valign(gtk4::Align::Center);
+    wifibox.set_halign(gtk4::Align::Center);
+    wifibox.append(&Label::builder()
+        .name("heading")
+        .label("Internet is Required")
+        .justify(gtk4::Justification::Left)
+        .build()
+    );
     stack.add_named(&wifibox, Some("wifi"));
     stack.set_visible_child_name("wifi");
 
-    
     let networks = scan_networks();
     for ssid in networks {
         wifibox.append(&Label::new(Some(&ssid)));
