@@ -352,13 +352,15 @@ fn build_ui(app: &Application) {
     
     let wifibox_entries = GtkBox::new(Orientation::Vertical, 0);
     wifibox.append(&wifibox_entries);
-    let appendinto_wifibox = |boxxy: GtkBox| {
+    let appendinto_wifibox = |boxxy: GtkBox, error: Label| {
         while let Some(child) = boxxy.first_child() {
             boxxy.remove(&child);
         }
 
         let networks = scan_networks();
+        let error_clone = error.clone();
         for ssid in networks {
+            let ssid_for_connecting = ssid.to_string();
             let name = ssid.to_string();
             let entry = &Button::builder()
                 .css_classes(["wifi-entry"])
@@ -392,21 +394,40 @@ fn build_ui(app: &Application) {
                 ent.remove_css_class("wifi-entry");
                 ent.add_css_class("wifi-selected");
                 pass_clone.set_visible(true);
+            }); 
+
+            let error_clone_inner = error_clone.clone();
+            pass.connect_activate(move |entry| {
+                let password = entry.text();
+                let status = Command::new("nmcli")
+                    .args(&["device", "wifi", "connect", &ssid_for_connecting, "password", &password])
+                    .status()
+                    .expect("Failed to execute nmcli");
+                if status.success() {
+                    error_clone_inner.set_text("connection successfull");
+                } else {
+                    error_clone_inner.set_text("Failed to connect");
+                }
+
             });
         }
 
     };
 
+    let error = Label::new(Some(""));
+    wifibox.append(&error);
+
     let refresh = Button::builder()
         .icon_name("view-refresh-symbolic")
         .build();
 
+    let error_clone = error.clone();
     let wifibox_entries_clone = wifibox_entries.clone();
     refresh.connect_clicked(move |_| {
-        appendinto_wifibox(wifibox_entries_clone.clone());
+        appendinto_wifibox(wifibox_entries_clone.clone(), error_clone.clone());
     });
 
-    appendinto_wifibox(wifibox_entries);
+    appendinto_wifibox(wifibox_entries, error);
     wifibox.append(&refresh);
     stack.add_named(&wifibox, Some("wifi"));
     stack.set_visible_child_name("wifi");
