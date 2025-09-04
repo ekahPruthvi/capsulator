@@ -1,4 +1,4 @@
-use gtk4::{prelude::*, Application, ApplicationWindow, Box as GtkBox, DrawingArea, Orientation, Overlay, Label, Stack, CssProvider, glib};
+use gtk4::{glib, prelude::*, Application, ApplicationWindow, Box as GtkBox, Button, CssProvider, DrawingArea, Entry, Label, Orientation, Overlay, Stack};
 use gtk4::gdk::Display;
 use gtk4_layer_shell::{LayerShell, Layer, Edge};
 use std::cell::RefCell;
@@ -61,7 +61,6 @@ fn scan_networks() -> Vec<String> {
     let stdout = String::from_utf8_lossy(&output.stdout);
     
     stdout.lines()
-        .skip(1)
         .filter_map(|line| line.split_whitespace().next())
         .map(|ssid| ssid.to_string())
         .collect()
@@ -281,6 +280,30 @@ fn build_ui(app: &Application) {
             box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
         }
 
+        .wifi-entry {
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background-color: rgba(255, 255, 255, 0.32);
+        }
+
+        .wifi-selected {
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 20px 20px 0px 0px;
+            border: 1px 1px 0px 1px solid rgba(255, 255, 255, 0.16);
+            background-color: rgba(255, 255, 255, 0.32);
+        }
+
+        .wifi-entry-pass {
+            padding: 5px;
+            font-size: 16px;
+            border-radius: 0px 0px 20px 20px;
+            border: 1px 1px 1px 1px solid rgba(255, 255, 255, 0.16);
+            background-color: rgba(255, 255, 255, 0.32);
+        }
+
         ",
     );
 
@@ -319,19 +342,74 @@ fn build_ui(app: &Application) {
     wifibox.set_size_request(500, 500);
     wifibox.set_valign(gtk4::Align::Center);
     wifibox.set_halign(gtk4::Align::Center);
+
     wifibox.append(&Label::builder()
         .name("heading")
         .label("Internet is Required")
         .justify(gtk4::Justification::Left)
         .build()
     );
+    
+    let wifibox_entries = GtkBox::new(Orientation::Vertical, 0);
+    wifibox.append(&wifibox_entries);
+    let appendinto_wifibox = |boxxy: GtkBox| {
+        while let Some(child) = boxxy.first_child() {
+            boxxy.remove(&child);
+        }
+
+        let networks = scan_networks();
+        for ssid in networks {
+            let name = ssid.to_string();
+            let entry = &Button::builder()
+                .css_classes(["wifi-entry"])
+                .label(ssid)
+                .margin_top(10)
+                .build();
+            let entry_clone = entry.clone();
+            boxxy.append(entry);
+            let pass = &Entry::builder()
+                .name(name)
+                .placeholder_text("  Enter Password")
+                .css_classes(["wifi-entry-pass"])
+                .visibility(true)
+                .visible(false)
+                .build();
+            let pass_clone = pass.clone();
+            boxxy.append(pass);
+
+            let boxxy_clone = boxxy.clone();
+            entry_clone.connect_clicked(move |ent| {
+                let mut child = boxxy_clone.first_child();
+                while let Some(widget) = child {
+                    if let Some(button) = widget.downcast_ref::<Button>() {
+                        button.remove_css_class("wifi-selected");
+                        button.add_css_class("wifi-entry");
+                    } else if let Some(entry) = widget.downcast_ref::<Entry>() {
+                        entry.set_visible(false);
+                    }
+                    child = widget.next_sibling();
+                }
+                ent.remove_css_class("wifi-entry");
+                ent.add_css_class("wifi-selected");
+                pass_clone.set_visible(true);
+            });
+        }
+
+    };
+
+    let refresh = Button::builder()
+        .icon_name("view-refresh-symbolic")
+        .build();
+
+    let wifibox_entries_clone = wifibox_entries.clone();
+    refresh.connect_clicked(move |_| {
+        appendinto_wifibox(wifibox_entries_clone.clone());
+    });
+
+    appendinto_wifibox(wifibox_entries);
+    wifibox.append(&refresh);
     stack.add_named(&wifibox, Some("wifi"));
     stack.set_visible_child_name("wifi");
-
-    let networks = scan_networks();
-    for ssid in networks {
-        wifibox.append(&Label::new(Some(&ssid)));
-    }
     
     stack_box.append(&stack);
     main_box.append(&stack_box);
