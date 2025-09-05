@@ -430,7 +430,7 @@ fn build_ui(app: &Application) {
     stack.set_visible_child_name("wifi");
 
     // ---------------------------------------------------------------- 2n page
-    let up_box = GtkBox::new(Orientation::Horizontal, 5);
+    let up_box = GtkBox::new(Orientation::Vertical, 5);
     up_box.set_vexpand(false);
     up_box.set_hexpand(false);
     up_box.set_size_request(500, 500);
@@ -445,15 +445,22 @@ fn build_ui(app: &Application) {
     picture.set_hexpand(true);    
     picture.set_vexpand(true);
 
+    let start = Button::builder()
+        .child(&Label::new(Some("Begin installation")))
+        .hexpand(true)
+        .vexpand(true)
+        .halign(gtk4::Align::Center)
+        .valign(gtk4::Align::Baseline)
+        .margin_bottom(20)
+        .build();
+
     let stack_clone = stack.clone();
-    glib::timeout_add_local(std::time::Duration::from_secs(9), move || {
+    start.connect_clicked(move |_| {
         stack_clone.set_visible_child_name("pacman");
-        glib::ControlFlow::Break
-    });
-
-
+    }); 
 
     up_box.append(&picture);
+    up_box.append(&start);
     stack.add_named(&up_box, Some("intro"));
     if is_connected(){
         stack.set_visible_child_name("intro");
@@ -547,8 +554,6 @@ fn build_ui(app: &Application) {
     stack_box.append(&stack);
     main_box.append(&stack_box);
     
-
-
     progressbox.append(&drawing_area);
     main_box.append(&progressbox);
 
