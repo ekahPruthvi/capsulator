@@ -1,9 +1,11 @@
-use gtk4::{glib, prelude::*, Application, ApplicationWindow, Box as GtkBox, Button, CssProvider, DrawingArea, Entry, Label, Orientation, Overlay, Stack};
+use gtk4::{glib, prelude::*, Application, ApplicationWindow, Box as GtkBox, Button, CssProvider, DrawingArea, Entry, Label, Orientation, Overlay, Stack, Picture};
 use gtk4::gdk::Display;
 use gtk4_layer_shell::{LayerShell, Layer, Edge};
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::process::{Command, exit};
+use vte4::{Terminal, Pty, PtyFlags};
+
 
 fn main() {
     let app = Application::builder()
@@ -13,44 +15,6 @@ fn main() {
     app.connect_activate(build_ui);
     app.run();
 }
-
-// fn typing_effect(label: &Label, text: &str, delay_ms: u64) {
-//     let label = label.clone();
-//     let chars: Vec<char> = text.chars().collect();
-//     let index = Rc::new(RefCell::new(0));
-//     let chars_rc = Rc::new(chars);
-
-//     glib::timeout_add_local(std::time::Duration::from_millis(delay_ms), move || {
-//         let i = *index.borrow();
-//         if i < chars_rc.len() {
-//             let current_text = chars_rc.iter().take(i + 1).collect::<String>();
-//             label.set_markup(&current_text);
-//             *index.borrow_mut() += 1;
-//             glib::ControlFlow::Continue
-//         } else {
-//             glib::ControlFlow::Break
-//         }
-//     });
-// }
-
-// fn typing_effect_normal(label: &Label, text: &str, delay_ms: u64) {
-//     let label = label.clone();
-//     let chars: Vec<char> = text.chars().collect();
-//     let index = Rc::new(RefCell::new(0));
-//     let chars_rc = Rc::new(chars);
-
-//     glib::timeout_add_local(std::time::Duration::from_millis(delay_ms), move || {
-//         let i = *index.borrow();
-//         if i < chars_rc.len() {
-//             let current_text = chars_rc.iter().take(i + 1).collect::<String>();
-//             label.set_text(&current_text);
-//             *index.borrow_mut() += 1;
-//             glib::ControlFlow::Continue
-//         } else {
-//             glib::ControlFlow::Break
-//         }
-//     });
-// }
 
 fn scan_networks() -> Vec<String> {
     let output = Command::new("nmcli")
@@ -81,23 +45,22 @@ fn draw_circle_progress(cr: &gtk4::cairo::Context, percent: f64) {
     let _ = cr.stroke();
 
     // Progress arc
-    cr.set_source_rgba(255.0/255.0, 71.0/255.0, 71.0/255.0, 1.0);
+    cr.set_source_rgba(255.0/255.0, 155.0/255.0, 155.0/255.0, 1.0);
     let angle = percent / 100.0 * 2.0 * std::f64::consts::PI;
     cr.arc(center_x, center_y, radius, -std::f64::consts::PI / 2.0, angle - std::f64::consts::PI / 2.0);
     let _ = cr.stroke();
 
-    // Percentage text
-    cr.set_source_rgb(1.0, 1.0, 1.0);
-    cr.select_font_face("Sans", gtk4::cairo::FontSlant::Normal, gtk4::cairo::FontWeight::Bold);
-    cr.set_font_size(12.0);
-    let text = format!("{:.0}%", percent);
-    let extents = cr.text_extents(&text).unwrap();
-    cr.move_to(
-        center_x - extents.width() / 2.0,
-        center_y + extents.height() / 2.0,
-    );
 }
 
+fn is_connected() -> bool {
+    let output = Command::new("nmcli")
+        .args(&["-t", "-f", "STATE", "general"])
+        .output()
+        .expect("Failed to run nmcli");
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    stdout.trim() == "connected"
+}
 
 
 fn build_ui(app: &Application) {
@@ -330,10 +293,30 @@ fn build_ui(app: &Application) {
         .vexpand(true)
         .transition_type(gtk4::StackTransitionType::Crossfade)
         .build();
-    // let click = Rc::new(Cell::new(0));
     let stack_box = GtkBox::new(Orientation::Horizontal, 5);
     stack_box.set_hexpand(true);
     stack_box.set_vexpand(true);
+
+    let progressbox = GtkBox::new(Orientation::Horizontal, 5);
+    progressbox.set_widget_name("progressbox");
+    progressbox.set_vexpand(true);
+    progressbox.set_hexpand(true);
+    progressbox.set_valign(gtk4::Align::End);
+    progressbox.set_halign(gtk4::Align::Center);
+    let info = Label::new(Some("Till cynageOS"));
+    progressbox.append(&info);
+
+    let drawing_area = DrawingArea::builder()
+        .content_width(40)
+        .content_height(40)
+        .build();
+
+    drawing_area.set_draw_func(move |_, cr, _, _| {
+        draw_circle_progress(cr, 0.0);
+    });
+
+
+    // ---------------------------------------------------------------- 1s page
 
     let wifibox = GtkBox::new(Orientation::Vertical, 5);
     wifibox.set_widget_name("inbox");
@@ -352,7 +335,7 @@ fn build_ui(app: &Application) {
     
     let wifibox_entries = GtkBox::new(Orientation::Vertical, 0);
     wifibox.append(&wifibox_entries);
-    let appendinto_wifibox = |boxxy: GtkBox, error: Label| {
+    let appendinto_wifibox = |boxxy: GtkBox, error: Label, stack: Stack| {
         while let Some(child) = boxxy.first_child() {
             boxxy.remove(&child);
         }
@@ -397,6 +380,7 @@ fn build_ui(app: &Application) {
             }); 
 
             let error_clone_inner = error_clone.clone();
+            let stack_clone = stack.clone();
             pass.connect_activate(move |entry| {
                 let password = entry.text();
                 let status = Command::new("nmcli")
@@ -405,6 +389,7 @@ fn build_ui(app: &Application) {
                     .expect("Failed to execute nmcli");
                 if status.success() {
                     error_clone_inner.set_text("connection successfull");
+                    stack_clone.set_visible_child_name("intro");
                 } else {
                     error_clone_inner.set_text("Failed to connect");
                 }
@@ -423,34 +408,65 @@ fn build_ui(app: &Application) {
 
     let error_clone = error.clone();
     let wifibox_entries_clone = wifibox_entries.clone();
+    let stack_clone = stack.clone();
     refresh.connect_clicked(move |_| {
-        appendinto_wifibox(wifibox_entries_clone.clone(), error_clone.clone());
+        appendinto_wifibox(wifibox_entries_clone.clone(), error_clone.clone(), stack_clone.clone());
+        error_clone.clone().set_text("");
     });
 
-    appendinto_wifibox(wifibox_entries, error);
+    let stack_clone = stack.clone();
+    appendinto_wifibox(wifibox_entries, error, stack_clone.clone());
     wifibox.append(&refresh);
     stack.add_named(&wifibox, Some("wifi"));
     stack.set_visible_child_name("wifi");
+
+    // ---------------------------------------------------------------- 2n page
+    let up_box = GtkBox::new(Orientation::Horizontal, 5);
+    up_box.set_vexpand(false);
+    up_box.set_hexpand(false);
+    up_box.set_size_request(500, 500);
+    up_box.set_valign(gtk4::Align::Center);
+    up_box.set_halign(gtk4::Align::Center);
+
+    let file = gtk4::gio::File::for_path("/home/ekah/cynageOSimages/intro.png");
+
+    let picture = Picture::for_file(&file);
+    picture.set_valign(gtk4::Align::Center);
+    picture.set_halign(gtk4::Align::Center);
+    picture.set_hexpand(true);    
+    picture.set_vexpand(true);
+
+    let stack_clone = stack.clone();
+    glib::timeout_add_local(std::time::Duration::from_secs(9), move || {
+        stack_clone.set_visible_child_name("pacman");
+        glib::ControlFlow::Break
+    });
+
+
+
+    up_box.append(&picture);
+    stack.add_named(&up_box, Some("intro"));
+    if is_connected(){
+        stack.set_visible_child_name("intro");
+    }
     
+    // ---------------------------------------------------------------- 3r page
+    let pacman = GtkBox::new(Orientation::Vertical, 5);
+    pacman.set_vexpand(false);
+    pacman.set_hexpand(false);
+    pacman.set_size_request(500, 500);
+    pacman.set_valign(gtk4::Align::Center);
+    pacman.set_halign(gtk4::Align::Center);
+
+
+    stack.add_named(&pacman, Some("pacman"));
+
+    // ---------------------------------------------------------------- main box
+
     stack_box.append(&stack);
     main_box.append(&stack_box);
     
-    let progressbox = GtkBox::new(Orientation::Horizontal, 5);
-    progressbox.set_widget_name("progressbox");
-    progressbox.set_vexpand(true);
-    progressbox.set_hexpand(true);
-    progressbox.set_valign(gtk4::Align::End);
-    progressbox.set_halign(gtk4::Align::Center);
-    progressbox.append(&Label::new(Some("Till cynageOS")));
 
-    let drawing_area = DrawingArea::builder()
-        .content_width(40)
-        .content_height(40)
-        .build();
-
-    drawing_area.set_draw_func(move |_, cr, _, _| {
-        draw_circle_progress(cr, 0.0);
-    });
 
     progressbox.append(&drawing_area);
     main_box.append(&progressbox);
