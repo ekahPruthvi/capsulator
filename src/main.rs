@@ -65,7 +65,7 @@ fn is_connected() -> bool {
     stdout.trim() == "connected"
 }
 
-fn termially_ill(boxxy: &GtkBox, argv: [&'static str; 3], break_flag: Arc<AtomicBool>, text: &str, drawing_area: &DrawingArea, info: Label) {
+fn termially_ill(boxxy: &GtkBox, stack: &Stack, argv: [&'static str; 3], break_flag: Arc<AtomicBool>, text: &str, drawing_area: &DrawingArea, info: &Label, percent: f64, next: &str) {
     while let Some(child) = boxxy.first_child() {
         boxxy.remove(&child);
     }
@@ -124,11 +124,15 @@ fn termially_ill(boxxy: &GtkBox, argv: [&'static str; 3], break_flag: Arc<Atomic
     let progress_clone2 = progress.clone();
     let break_flag_clone = break_flag.clone();
 
+    let next_one = next.to_string();
+    let stack_clone = stack.clone();
+    let info_clone = info.clone();
     glib::timeout_add_local(std::time::Duration::from_millis(70), move || {
         if break_flag_clone.load(Ordering::SeqCst) {
-            info.set_text("Till CynageOS");
+            info_clone.set_text("Till CynageOS");
+            stack_clone.set_visible_child_name(&next_one);
             drawing_area_clone.set_draw_func(move |_, cr, _, _| {
-                draw_circle_progress(cr, 2.0);
+                draw_circle_progress(cr, percent);
             });
             return glib::ControlFlow::Break;
         }
@@ -557,10 +561,24 @@ fn build_ui(app: &Application) {
     start.connect_clicked(move |_| {
         stack_clone.set_visible_child_name("pacman");        
         let argv = ["bash", "-c", "sudo pacman -Sy && sudo pacman -Sy archlinux-keyring"];
-        termially_ill(&pacman_clone, argv, break_flag_clone.clone(), "updating pacman keyrings", &drawing_area_clone, info.clone());
+        termially_ill(
+            &pacman_clone, 
+            &stack_clone, 
+            argv, 
+            break_flag_clone.clone(), 
+            "updating pacman keyrings", 
+            &drawing_area_clone, 
+            &info.clone(), 
+            2.0,
+            "partinfo"
+        );
     });
 
     stack.add_named(&pacman, Some("pacman"));
+
+    // ---------------------------------------------------------------- 4t page
+    let part = GtkBox::new(Orientation::Vertical, 5);
+    stack.add_named(&part, Some("partinfo"));
 
     // ---------------------------------------------------------------- main box
 
