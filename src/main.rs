@@ -1,10 +1,12 @@
-use gtk4::{glib, prelude::*, Application, ApplicationWindow, Box as GtkBox, Button, CssProvider, DrawingArea, Entry, Label, Orientation, Overlay, Stack, Picture};
+use gtk4::{glib, prelude::*, Application, ApplicationWindow, gio, Box as GtkBox, Button, CssProvider, DrawingArea, Entry, Label, Orientation, Overlay, Stack, Picture};
 use gtk4::gdk::Display;
 use gtk4_layer_shell::{LayerShell, Layer, Edge};
-use std::cell::RefCell;
-use std::rc::Rc;
 use std::process::{Command, exit};
-use vte4::{Terminal, Pty, PtyFlags};
+use std::cell::Cell;
+use std::rc::Rc;
+use vte4::{Terminal, PtyFlags, TerminalExtManual};
+use gtk4::glib::{SpawnFlags,Pid,Error};
+use std::sync::{Arc, atomic::{AtomicBool, Ordering}};
 
 
 fn main() {
@@ -235,6 +237,13 @@ fn build_ui(app: &Application) {
             padding: 30px 30px 30px 30px;
         }
 
+        #inbox-dark {
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            background-color: rgba(0, 0, 0, 1);
+            padding: 30px 30px 30px 30px;
+        }
+
         #progressbox{
             border-radius: 50px;
             border: 1px solid rgba(255, 255, 255, 0.16);
@@ -451,13 +460,85 @@ fn build_ui(app: &Application) {
     }
     
     // ---------------------------------------------------------------- 3r page
+    let break_flag = Arc::new(AtomicBool::new(false));
     let pacman = GtkBox::new(Orientation::Vertical, 5);
+    pacman.set_widget_name("inbox-dark");
     pacman.set_vexpand(false);
     pacman.set_hexpand(false);
     pacman.set_size_request(500, 500);
     pacman.set_valign(gtk4::Align::Center);
     pacman.set_halign(gtk4::Align::Center);
 
+    let terminal = Terminal::new();
+    terminal.set_vexpand(true);
+    terminal.set_hexpand(true);
+
+    let break_flag_clone = break_flag.clone();
+    let argv = ["bash", "-c", "sudo pacman -Sy && sudo pacman -Sy archlinux-keyring"];
+    terminal.spawn_async(
+        PtyFlags::DEFAULT,
+        None,
+        &argv,
+        &[],
+        SpawnFlags::DEFAULT,
+        || {},
+        -1,
+        None::<&gtk4::gio::Cancellable>,
+        move |res: Result<Pid, Error>| {
+            let break_flag_clone_inner = break_flag_clone.clone();
+            match res {
+                Ok(pid) =>  {
+                    glib::child_watch_add(pid, move |_pid, status| {
+                        println!("Process exited with status {}", status);
+                        break_flag_clone_inner.store(true, Ordering::SeqCst);
+                    });
+                },
+                Err(e) => eprintln!("Failed to spawn terminal process: {}", e),
+            }
+        }
+    );
+
+    pacman.append(&terminal);
+
+    info.set_text("updating pacman keyrings");
+
+    let progress_values = vec![
+        0.0, 5.0, 10.0, 15.0, 20.0, 25.0,
+        30.0, 35.0, 40.0, 45.0,
+        50.0, 55.0, 60.0, 65.0,
+        70.0, 75.0, 80.0, 85.0,
+        90.0, 95.0, 100.0,
+    ];
+    let current_index = Rc::new(Cell::new(0));
+
+    let progress = Rc::new(Cell::new(progress_values[0]));
+
+    let progress_clone = progress.clone();
+    drawing_area.set_draw_func(move |_, cr, _, _| {
+        draw_circle_progress(cr, progress_clone.get());
+    });
+
+    let drawing_area_clone = drawing_area.clone();
+    let current_index_clone = current_index.clone();
+    let progress_clone2 = progress.clone();
+    let break_flag_clone = break_flag.clone();
+
+    glib::timeout_add_local(std::time::Duration::from_millis(70), move || {
+        if break_flag_clone.load(Ordering::SeqCst) {
+            info.set_text("Till CynageOS");
+            drawing_area_clone.set_draw_func(move |_, cr, _, _| {
+                draw_circle_progress(cr, 2.0);
+            });
+            return glib::ControlFlow::Break;
+        }
+        let idx = (current_index_clone.get() + 1) % progress_values.len();
+        current_index_clone.set(idx);
+        progress_clone2.set(progress_values[idx]);
+
+        drawing_area_clone.queue_draw();
+
+        glib::ControlFlow::Continue
+    });
 
     stack.add_named(&pacman, Some("pacman"));
 
