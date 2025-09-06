@@ -1,3 +1,4 @@
+use gtk4::glib::property::PropertySet;
 use gtk4::{glib, prelude::*, Application, ApplicationWindow, gio, Box as GtkBox, Button, CssProvider, DrawingArea, Entry, Label, Orientation, Overlay, Stack, Picture};
 use gtk4::gdk::Display;
 use gtk4_layer_shell::{LayerShell, Layer, Edge};
@@ -65,7 +66,7 @@ fn is_connected() -> bool {
     stdout.trim() == "connected"
 }
 
-fn termially_ill(boxxy: &GtkBox, stack: &Stack, argv: [&'static str; 3], break_flag: Arc<AtomicBool>, text: &str, drawing_area: &DrawingArea, info: &Label, percent: f64, next: &str) {
+fn termially_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&'static str>, break_flag: Arc<AtomicBool>, text: &str, drawing_area: &DrawingArea, info: &Label, percent: f64, next: &str) {
     while let Some(child) = boxxy.first_child() {
         boxxy.remove(&child);
     }
@@ -558,9 +559,10 @@ fn build_ui(app: &Application) {
     let break_flag_clone = break_flag.clone();
     let pacman_clone = pacman.clone();
     let drawing_area_clone = drawing_area.clone();
+    let info_clone = info.clone();
     start.connect_clicked(move |_| {
         stack_clone.set_visible_child_name("pacman");        
-        let argv = ["bash", "-c", "sudo pacman -Sy && sudo pacman -Sy archlinux-keyring"];
+        let argv = vec!["bash", "-c", "sudo pacman -Sy && sudo pacman -Sy archlinux-keyring"];
         termially_ill(
             &pacman_clone, 
             &stack_clone, 
@@ -568,7 +570,7 @@ fn build_ui(app: &Application) {
             break_flag_clone.clone(), 
             "updating pacman keyrings", 
             &drawing_area_clone, 
-            &info.clone(), 
+            &info_clone.clone(), 
             2.0,
             "partinfo"
         );
@@ -578,10 +580,78 @@ fn build_ui(app: &Application) {
 
     // ---------------------------------------------------------------- 4t page
     let part = GtkBox::new(Orientation::Vertical, 5);
+    part.set_widget_name("inbox-dark");
+    part.set_vexpand(false);
+    part.set_hexpand(false);
+    part.set_size_request(500, 700);
+    part.set_valign(gtk4::Align::Center);
+    part.set_halign(gtk4::Align::Center);
     stack.add_named(&part, Some("partinfo"));
 
-    // ---------------------------------------------------------------- main box
+    let stack_clone_4th = stack.clone();
+    let break_flag_clone_4th = break_flag.clone();
+    let drawing_area_clone = drawing_area.clone();
+    let info_clone = info.clone();
+    glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
+        if stack_clone_4th.visible_child_name() == Some("partinfo".into()) {
+            break_flag_clone_4th.set(false);
+            let argv = vec!["bash"];
+            termially_ill(
+                &part, 
+                &stack_clone_4th, 
+                argv, 
+                break_flag_clone_4th.clone(), 
+                "Creating partitions", 
+                &drawing_area_clone, 
+                &info_clone.clone(), 
+                10.0, 
+                "formatpart"
+            );
+            part.append(&Label::new(Some(&format!("use <lsblk> to check the disks\nand <cfdisk> to create partitions\nMake atleast 800M for boot (EFI partiton)\nand swap (linux swap) if desired and rest for root (linux filesystem)\nswap is optional"))));
+            return glib::ControlFlow::Break;
+        }
+        glib::ControlFlow::Continue
+    });
 
+    // ---------------------------------------------------------------- 5th page
+    let format = GtkBox::new(Orientation::Horizontal, 5);
+    format.set_widget_name("inbox-dark");
+    format.set_vexpand(false);
+    format.set_hexpand(false);
+    format.set_size_request(700, 500);
+    format.set_valign(gtk4::Align::Center);
+    format.set_halign(gtk4::Align::Center);
+    stack.add_named(&format, Some("formatpart"));
+
+    let output = Command::new("lsblk")
+        .output()
+        .expect("Failed to execute lsblk");
+    let output_str = String::from_utf8_lossy(&output.stdout);
+
+    let lsblk = Label::new(Some(&output_str));
+
+    lsblk.set_wrap(true);
+    lsblk.set_hexpand(true);
+    lsblk.set_justify(gtk4::Justification::Left);
+
+    let mut entries = Vec::new();
+
+    let partbox = GtkBox::new(Orientation::Vertical, 5);
+
+    for i in 0..3 {
+        let entry = Entry::new();
+        entry.set_placeholder_text(if i == 0{
+            Some("Enter ")
+        } );
+        partbox.append(&entry);
+        entries.push(entry);
+    }
+
+    entries
+
+    format.append(&lsblk);
+
+    // ---------------------------------------------------------------- main box
     stack_box.append(&stack);
     main_box.append(&stack_box);
     
