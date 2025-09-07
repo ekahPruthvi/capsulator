@@ -1,8 +1,8 @@
 use gtk4::glib::property::PropertySet;
-use gtk4::{glib, prelude::*, Application, ApplicationWindow, gio, Box as GtkBox, Button, CssProvider, DrawingArea, Entry, Label, Orientation, Overlay, Stack, Picture};
+use gtk4::{glib, prelude::*, Application, ApplicationWindow, Box as GtkBox, Button, CssProvider, DrawingArea, Entry, Label, Orientation, Overlay, Stack, Picture};
 use gtk4::gdk::Display;
 use gtk4_layer_shell::{LayerShell, Layer, Edge};
-use std::process::{Command, exit};
+use std::process::Command;
 use std::cell::Cell;
 use std::rc::Rc;
 use vte4::{Terminal, PtyFlags, TerminalExtManual};
@@ -728,7 +728,7 @@ fn build_ui(app: &Application) {
     let info_clone = info.clone();
     makepart.connect_clicked(move |_| {
         stack_clone.set_visible_child_name("mount");        
-        let mut argv = vec!["bash", "-c", "/usr/bin/archin.sh"];
+        let argv = vec!["bash", "-c", "/usr/bin/archin.sh"];
         termially_ill(
             &mnt_clone, 
             &stack_clone, 
