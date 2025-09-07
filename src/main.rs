@@ -66,7 +66,7 @@ fn is_connected() -> bool {
     stdout.trim() == "connected"
 }
 
-fn termially_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&'static str>, break_flag: Arc<AtomicBool>, text: &str, drawing_area: &DrawingArea, info: &Label, percent: f64, next: &str) {
+fn termially_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Arc<AtomicBool>, text: &str, drawing_area: &DrawingArea, info: &Label, percent: f64, next: &str) {
     while let Some(child) = boxxy.first_child() {
         boxxy.remove(&child);
     }
@@ -520,7 +520,7 @@ fn build_ui(app: &Application) {
     up_box.set_valign(gtk4::Align::Center);
     up_box.set_halign(gtk4::Align::Center);
 
-    let file = gtk4::gio::File::for_path("/home/ekah/cynageOSimages/intro.png");
+    let file = gtk4::gio::File::for_path("/var/lib/cos/intro.png");
 
     let picture = Picture::for_file(&file);
     picture.set_valign(gtk4::Align::Center);
@@ -571,7 +571,7 @@ fn build_ui(app: &Application) {
             "updating pacman keyrings", 
             &drawing_area_clone, 
             &info_clone.clone(), 
-            2.0,
+            5.0,
             "partinfo"
         );
     });
@@ -607,18 +607,18 @@ fn build_ui(app: &Application) {
                 10.0, 
                 "formatpart"
             );
-            part.append(&Label::new(Some(&format!("use <lsblk> to check the disks\nand <cfdisk> to create partitions\nMake atleast 800M for boot (EFI partiton)\nand swap (linux swap) if desired and rest for root (linux filesystem)\nswap is optional"))));
+            part.append(&Label::new(Some(&format!("use <lsblk> to check the disks\nand <cfdisk> to create partitions\nMake atleast 800M for boot (EFI partiton)\nand swap (linux swap) if desired and rest for root (linux filesystem)\nswap is optional and <exit> after finished"))));
             return glib::ControlFlow::Break;
         }
         glib::ControlFlow::Continue
     });
 
-    // ---------------------------------------------------------------- 5th page
+    // ---------------------------------------------------------------- 5t page
     let format = GtkBox::new(Orientation::Horizontal, 5);
     format.set_widget_name("inbox-dark");
     format.set_vexpand(false);
     format.set_hexpand(false);
-    format.set_size_request(700, 500);
+    format.set_size_request(900, 500);
     format.set_valign(gtk4::Align::Center);
     format.set_halign(gtk4::Align::Center);
     stack.add_named(&format, Some("formatpart"));
@@ -632,24 +632,115 @@ fn build_ui(app: &Application) {
 
     lsblk.set_wrap(true);
     lsblk.set_hexpand(true);
+    lsblk.set_width_request(400);
+    lsblk.set_halign(gtk4::Align::Start);
     lsblk.set_justify(gtk4::Justification::Left);
 
-    let mut entries = Vec::new();
-
     let partbox = GtkBox::new(Orientation::Vertical, 5);
+    partbox.set_vexpand(true);
+    partbox.set_valign(gtk4::Align::Center);
 
-    for i in 0..3 {
-        let entry = Entry::new();
-        entry.set_placeholder_text(if i == 0{
-            Some("Enter ")
-        } );
-        partbox.append(&entry);
-        entries.push(entry);
-    }
+    let bootentry = Entry::new();
+    bootentry.set_width_request(400);
+    bootentry.set_placeholder_text(Some("Enter boot path"));
 
-    entries
+    let rootentry = Entry::new();
+    rootentry.set_width_request(400);
+    rootentry.set_placeholder_text(Some("Enter root path"));
+
+    let swapentry = Entry::new();
+    swapentry.set_width_request(400);
+    swapentry.set_placeholder_text(Some("Enter Swap path (optional)"));
+    partbox.append(&bootentry);
+    partbox.append(&rootentry);
+    partbox.append(&swapentry);
+
+    let makepart = Button::builder()
+        .child(&Label::new(Some("Begin partition formating")))
+        .hexpand(true)
+        .vexpand(true)
+        .halign(gtk4::Align::Center)
+        .valign(gtk4::Align::Baseline)
+        .margin_bottom(20)
+        .build();
+
+    partbox.append(&makepart);
 
     format.append(&lsblk);
+    format.append(&partbox);
+
+    // ---------------------------------------------------------------- 6t page
+    let mount = GtkBox::new(Orientation::Horizontal, 5);
+    mount.set_widget_name("inbox-dark");
+    mount.set_vexpand(false);
+    mount.set_hexpand(false);
+    mount.set_size_request(900, 500);
+    mount.set_valign(gtk4::Align::Center);
+    mount.set_halign(gtk4::Align::Center);
+
+    stack.add_named(&mount, Some("mount"));
+
+
+
+    let stack_clone = stack.clone();
+    let break_flag_clone = break_flag.clone();
+    let mnt_clone = mount.clone();
+    let drawing_area_clone = drawing_area.clone();
+    let info_clone = info.clone();
+    makepart.connect_clicked(move |_| {
+        let rtpr = rootentry.text().to_string();
+        let btpr = bootentry.text().to_string();
+        let swppr = swapentry.text().to_string();
+        stack_clone.set_visible_child_name("mount");        
+        let mut argv = vec!["bash", "-c", "/usr/bin/mount.sh", &rtpr, &btpr, &swppr];
+        if !swppr.trim().is_empty() {
+            argv.push(&swppr);
+        }
+        termially_ill(
+            &mnt_clone, 
+            &stack_clone, 
+            argv, 
+            break_flag_clone.clone(), 
+            "Mounting filesystems", 
+            &drawing_area_clone, 
+            &info_clone.clone(), 
+            20.0,
+            "generatefs"
+        );
+    });
+
+
+    // ---------------------------------------------------------------- 7t page
+    let fsgen = GtkBox::new(Orientation::Horizontal, 5);
+    fsgen.set_widget_name("inbox-dark");
+    fsgen.set_vexpand(false);
+    fsgen.set_hexpand(false);
+    fsgen.set_size_request(900, 500);
+    fsgen.set_valign(gtk4::Align::Center);
+    fsgen.set_halign(gtk4::Align::Center);
+
+    stack.add_named(&fsgen, Some("generatefs"));
+
+    let stack_clone = stack.clone();
+    let break_flag_clone = break_flag.clone();
+    let mnt_clone = fsgen.clone();
+    let drawing_area_clone = drawing_area.clone();
+    let info_clone = info.clone();
+    makepart.connect_clicked(move |_| {
+        stack_clone.set_visible_child_name("mount");        
+        let mut argv = vec!["bash", "-c", "/usr/bin/archin.sh"];
+        termially_ill(
+            &mnt_clone, 
+            &stack_clone, 
+            argv, 
+            break_flag_clone.clone(), 
+            "Finishing arch install", 
+            &drawing_area_clone, 
+            &info_clone.clone(), 
+            50.0,
+            "done"
+        );
+    });
 
     // ---------------------------------------------------------------- main box
     stack_box.append(&stack);
