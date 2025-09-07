@@ -9,7 +9,6 @@ use vte4::{Terminal, PtyFlags, TerminalExtManual};
 use gtk4::glib::{SpawnFlags,Pid,Error};
 use std::sync::{Arc, atomic::{AtomicBool, Ordering}};
 
-
 fn main() {
     let _ = Command::new("NetworkManager");
     let app = Application::builder()
@@ -171,6 +170,10 @@ fn build_ui(app: &Application) {
         "
         window {
             background-color: rgba(0, 0, 0, 0);
+        }
+
+        label {
+            color: rgba(255, 255, 255, 1);
         }
 
         #cynide {
@@ -623,22 +626,14 @@ fn build_ui(app: &Application) {
     format.set_halign(gtk4::Align::Center);
     stack.add_named(&format, Some("formatpart"));
 
-    let output = Command::new("lsblk")
-        .output()
-        .expect("Failed to execute lsblk");
-    let output_str = String::from_utf8_lossy(&output.stdout);
-
-    let lsblk = Label::new(Some(&output_str));
-
-    lsblk.set_wrap(true);
-    lsblk.set_hexpand(true);
-    lsblk.set_width_request(400);
-    lsblk.set_halign(gtk4::Align::Start);
-    lsblk.set_justify(gtk4::Justification::Left);
-
-    let partbox = GtkBox::new(Orientation::Vertical, 5);
-    partbox.set_vexpand(true);
-    partbox.set_valign(gtk4::Align::Center);
+    let makepart = Button::builder()
+        .child(&Label::new(Some("Begin partition formating")))
+        .hexpand(true)
+        .vexpand(true)
+        .halign(gtk4::Align::Center)
+        .valign(gtk4::Align::Baseline)
+        .margin_bottom(20)
+        .build();
 
     let bootentry = Entry::new();
     bootentry.set_width_request(400);
@@ -651,23 +646,43 @@ fn build_ui(app: &Application) {
     let swapentry = Entry::new();
     swapentry.set_width_request(400);
     swapentry.set_placeholder_text(Some("Enter Swap path (optional)"));
-    partbox.append(&bootentry);
-    partbox.append(&rootentry);
-    partbox.append(&swapentry);
 
-    let makepart = Button::builder()
-        .child(&Label::new(Some("Begin partition formating")))
-        .hexpand(true)
-        .vexpand(true)
-        .halign(gtk4::Align::Center)
-        .valign(gtk4::Align::Baseline)
-        .margin_bottom(20)
-        .build();
+    let stack_clone = stack.clone();
+    let bootentry_clone = bootentry.clone();
+    let rootentry_clone = rootentry.clone();
+    let swapentry_clone = swapentry.clone();
+    let makepart_clone = makepart.clone();
 
-    partbox.append(&makepart);
+    glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
+        if stack_clone.visible_child_name() == Some("formatpart".into()) {
+            let output = Command::new("lsblk")
+                .output()
+                .expect("Failed to execute lsblk");
+            let output_str = String::from_utf8_lossy(&output.stdout);
 
-    format.append(&lsblk);
-    format.append(&partbox);
+            let lsblk = Label::new(Some(&output_str));
+
+            lsblk.set_wrap(true);
+            lsblk.set_hexpand(true);
+            lsblk.set_width_request(400);
+            lsblk.set_halign(gtk4::Align::Start);
+            lsblk.set_justify(gtk4::Justification::Left);
+
+            let partbox = GtkBox::new(Orientation::Vertical, 5);
+            partbox.set_vexpand(true);
+            partbox.set_valign(gtk4::Align::Center);
+            partbox.append(&bootentry_clone);
+            partbox.append(&rootentry_clone);
+            partbox.append(&swapentry_clone);
+
+            partbox.append(&makepart_clone);
+
+            format.append(&lsblk);
+            format.append(&partbox);
+            return glib::ControlFlow::Break;
+        }
+        glib::ControlFlow::Continue
+    });
 
     // ---------------------------------------------------------------- 6t page
     let mount = GtkBox::new(Orientation::Horizontal, 5);
