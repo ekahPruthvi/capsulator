@@ -706,11 +706,11 @@ fn build_ui(app: &Application) {
 
     let bootentry = Entry::new();
     bootentry.set_width_request(400);
-    bootentry.set_placeholder_text(Some("Enter boot path"));
+    bootentry.set_placeholder_text(Some("Enter boot path (/dev/nvme0n1p*)"));
 
     let rootentry = Entry::new();
     rootentry.set_width_request(400);
-    rootentry.set_placeholder_text(Some("Enter root path"));
+    rootentry.set_placeholder_text(Some("Enter root path (/dev/nvme0n1p*)"));
 
     let swapentry = Entry::new();
     swapentry.set_width_request(400);

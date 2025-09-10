@@ -27,4 +27,5 @@ file_permissions=(
   ["/usr/bin/capper"]="0:0:755"
   ["/usr/bin/cap"]="0:0:755"
   ["/usr/bin/archincos.sh"]="0:0:755"
+  ["/usr/bin/setup"]="0:0:755"
 )

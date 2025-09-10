@@ -6,6 +6,8 @@ ROOT="$1"
 BOOT="$2"
 SWAP="$3"
 
+echo "ROOT='$1', BOOT='$2', SWAP='$3' ($# args)"
+
 if [ -z "$ROOT" ] || [ -z "$BOOT" ]; then
     echo "Usage: $0 <root_partition> <boot_partition> [swap_partition]"
     exit 1
@@ -38,7 +40,6 @@ fi
 
 set -e
 
-# Detect CPU and pick ucode
 if grep -qi 'amd' /proc/cpuinfo; then
     UCODE="amd-ucode"
 else
@@ -47,11 +48,9 @@ fi
 
 echo "Detected microcode: $UCODE"
 
-# Ask for username and computer name
 read -p "Enter your username: " USERNAME
 read -p "Enter your computer name (hostname): " COMPUTERNAME
 
-# Interactive locale selection via fzf
 LOCALE=$(cat /usr/share/i18n/SUPPORTED | fzf | cut -d ' ' -f1)
 echo "Selected locale: $LOCALE"
 
@@ -65,7 +64,6 @@ genfstab -U /mnt >> /mnt/etc/fstab
 echo "Resulting /mnt/etc/fstab:"
 cat /mnt/etc/fstab
 
-# Prepare the script for running inside chroot
 cat <<EOF > /mnt/root/chroot_setup.sh
 #!/bin/bash
 set -e
@@ -120,24 +118,6 @@ grub-mkconfig -o /boot/grub/grub.cfg
 echo "Enabling system services..."
 systemctl enable bluetooth
 systemctl enable NetworkManager
-
-echo "Copying 'setup' script to /usr/bin..."
-if [ -f /setup ]; then
-    cp /setup /usr/bin/setup
-    chmod +x /usr/bin/setup
-    # First boot only: setup will run one time
-    echo '[Unit]
-Description=Run setup script once after first boot
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/setup
-RemainAfterExit=false
-
-[Install]
-WantedBy=multi-user.target' > /etc/systemd/system/first-boot-setup.service
-    systemctl enable first-boot-setup.service
-fi
 
 echo "Finished inside chroot."
 EOF
