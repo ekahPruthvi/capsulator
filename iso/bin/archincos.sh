@@ -78,6 +78,8 @@ passwd $USERNAME
 echo "Editing sudoers..."
 sed -i '/%wheel ALL=(ALL:ALL) ALL/s/^# //' /etc/sudoers
 
+echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
+
 echo "Switching to user $USERNAME..."
 su - $USERNAME -c 'sudo pacman -Syu'
 
@@ -120,6 +122,7 @@ systemctl enable bluetooth
 systemctl enable NetworkManager
 
 echo "Finished inside chroot."
+sed -i '/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/s/^/# /' /etc/sudoers
 EOF
 
 chmod +x /mnt/root/chroot_setup.sh
