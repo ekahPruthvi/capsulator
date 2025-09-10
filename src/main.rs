@@ -1,5 +1,8 @@
 use gtk4::glib::property::PropertySet;
-use gtk4::{glib, prelude::*, Application, ApplicationWindow, Box as GtkBox, Button, CssProvider, DrawingArea, Entry, Label, Orientation, Overlay, Stack, Picture};
+use gtk4::{
+    glib, prelude::*, Application, ApplicationWindow, Box as GtkBox, Button, CssProvider, DrawingArea, Entry, Label, ScrolledWindow, 
+    Orientation, Overlay, Stack, Picture
+};
 use gtk4::gdk::Display;
 use gtk4_layer_shell::{LayerShell, Layer, Edge};
 use std::process::Command;
@@ -75,6 +78,9 @@ fn termially_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Arc
     terminal.set_hexpand(true);
 
     let break_flag_clone = break_flag.clone();
+
+    
+    println!("{:?}", argv);
 
     terminal.spawn_async(
         PtyFlags::DEFAULT,
@@ -170,10 +176,6 @@ fn build_ui(app: &Application) {
         "
         window {
             background-color: rgba(0, 0, 0, 0);
-        }
-
-        label {
-            color: rgba(255, 255, 255, 1);
         }
 
         #cynide {
@@ -307,6 +309,7 @@ fn build_ui(app: &Application) {
         #heading {
             font-size: 28px;
             font-weight: 900;
+            color: rgba(204, 204, 204, 1);
         }
 
         #mainbox {
@@ -339,19 +342,23 @@ fn build_ui(app: &Application) {
         }
 
         .wifi-entry {
+            all: unset;
             padding: 10px;
             font-size: 18px;
             border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.16);
-            background-color: rgba(255, 255, 255, 0.32);
+            background-color: rgba(59, 59, 59, 0.41);
+            color: rgba(255, 255, 255, 1);
         }
 
         .wifi-selected {
+            all: unset;
             padding: 10px;
             font-size: 18px;
             border-radius: 20px 20px 0px 0px;
-            border: 1px 1px 0px 1px solid rgba(255, 255, 255, 0.16);
-            background-color: rgba(255, 255, 255, 0.32);
+            border: 1px 1px 0px 1px solid rgba(255, 255, 255, 0.16);  
+            background-color: rgba(59, 59, 59, 0.41);
+            color: rgba(255, 255, 255, 1);
         }
 
         .wifi-entry-pass {
@@ -359,7 +366,55 @@ fn build_ui(app: &Application) {
             font-size: 16px;
             border-radius: 0px 0px 20px 20px;
             border: 1px 1px 1px 1px solid rgba(255, 255, 255, 0.16);
-            background-color: rgba(255, 255, 255, 0.32);
+            background-color: rgba(59, 59, 59, 0.41);\
+            color: rgba(255, 255, 255, 1);
+        }
+
+        #wifiscr scrollbar {
+            all: unset;
+            background-color: transparent;
+            border-radius: 12px;
+            margin: 2px;
+            min-width: 6px;
+            min-height: 6px;
+        }
+
+        #wifiscr scrollbar slider {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            transition: background-color 150ms ease;
+        }
+
+        #wifiscr scrollbar:hover slider {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        #wifiscr scrollbar.vertical {
+            margin-left: 12px;
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+
+        #wifiscr scrollbar.horizontal {
+            margin-top: 2px;
+        }
+
+        button {
+            all:unset;
+            padding: 10px;
+            background-color: rgba(46, 46, 46, 1);
+            color: rgba(134, 134, 134, 1);
+            border-radius: 15px;
+            box-shadow: rgba(43, 43, 43, 0.4) 0px 0px 0px 2px, rgba(41, 41, 41, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+        }
+
+        button:hover {
+            background-color: rgba(110, 110, 110, 1);
+            color: rgba(255, 255, 255, 1);
+        }
+
+        #ter_text {
+            color: rgba(109, 109, 109, 1);
         }
 
         ",
@@ -429,7 +484,12 @@ fn build_ui(app: &Application) {
     );
     
     let wifibox_entries = GtkBox::new(Orientation::Vertical, 0);
-    wifibox.append(&wifibox_entries);
+    let wifiscroller = ScrolledWindow::new();
+    wifiscroller.set_vexpand(true);
+    wifiscroller.set_hexpand(true);
+    wifiscroller.set_widget_name("wifiscr");
+    wifiscroller.set_child(Some(&wifibox_entries));
+    wifibox.append(&wifiscroller);
     let appendinto_wifibox = |boxxy: GtkBox, error: Label, stack: Stack| {
         while let Some(child) = boxxy.first_child() {
             boxxy.remove(&child);
@@ -610,7 +670,11 @@ fn build_ui(app: &Application) {
                 10.0, 
                 "formatpart"
             );
-            part.append(&Label::new(Some(&format!("use <lsblk> to check the disks\nand <cfdisk> to create partitions\nMake atleast 800M for boot (EFI partiton)\nand swap (linux swap) if desired and rest for root (linux filesystem)\nswap is optional and <exit> after finished"))));
+            let part_label = Label::builder()
+                .label("use <lsblk> to check the disks\nand <cfdisk> to create partitions\nMake atleast 800M for boot (EFI partiton)\nand swap (linux swap) if desired and rest for root (linux filesystem)\nswap is optional and <exit> after finished")
+                .name("ter_text") 
+                .build();
+            part.append(&part_label);
             return glib::ControlFlow::Break;
         }
         glib::ControlFlow::Continue
@@ -667,6 +731,7 @@ fn build_ui(app: &Application) {
             lsblk.set_width_request(400);
             lsblk.set_halign(gtk4::Align::Start);
             lsblk.set_justify(gtk4::Justification::Left);
+            lsblk.set_widget_name("ter_text");
 
             let partbox = GtkBox::new(Orientation::Vertical, 5);
             partbox.set_vexpand(true);
@@ -695,8 +760,6 @@ fn build_ui(app: &Application) {
 
     stack.add_named(&mount, Some("mount"));
 
-
-
     let stack_clone = stack.clone();
     let break_flag_clone = break_flag.clone();
     let mnt_clone = mount.clone();
@@ -707,10 +770,7 @@ fn build_ui(app: &Application) {
         let btpr = bootentry.text().to_string();
         let swppr = swapentry.text().to_string();
         stack_clone.set_visible_child_name("mount");        
-        let mut argv = vec!["bash", "-c", "/usr/bin/mount.sh", &rtpr, &btpr, &swppr];
-        if !swppr.trim().is_empty() {
-            argv.push(&swppr);
-        }
+        let argv = vec!["bash", "-c", "/usr/bin/archincos.sh", &rtpr, &btpr, &swppr];
         termially_ill(
             &mnt_clone, 
             &stack_clone, 
@@ -719,43 +779,42 @@ fn build_ui(app: &Application) {
             "Mounting filesystems", 
             &drawing_area_clone, 
             &info_clone.clone(), 
-            20.0,
+            50.0,
             "generatefs"
         );
     });
 
 
     // ---------------------------------------------------------------- 7t page
-    let fsgen = GtkBox::new(Orientation::Horizontal, 5);
-    fsgen.set_widget_name("inbox-dark");
-    fsgen.set_vexpand(false);
-    fsgen.set_hexpand(false);
-    fsgen.set_size_request(900, 500);
-    fsgen.set_valign(gtk4::Align::Center);
-    fsgen.set_halign(gtk4::Align::Center);
+    // let fsgen = GtkBox::new(Orientation::Horizontal, 5);
+    // fsgen.set_widget_name("inbox-dark");
+    // fsgen.set_vexpand(false);
+    // fsgen.set_hexpand(false);
+    // fsgen.set_size_request(900, 500);
+    // fsgen.set_valign(gtk4::Align::Center);
+    // fsgen.set_halign(gtk4::Align::Center);
 
-    stack.add_named(&fsgen, Some("generatefs"));
+    // stack.add_named(&fsgen, Some("generatefs"));
 
-    let stack_clone = stack.clone();
-    let break_flag_clone = break_flag.clone();
-    let mnt_clone = fsgen.clone();
-    let drawing_area_clone = drawing_area.clone();
-    let info_clone = info.clone();
-    makepart.connect_clicked(move |_| {
-        stack_clone.set_visible_child_name("mount");        
-        let argv = vec!["bash", "-c", "/usr/bin/archin.sh"];
-        termially_ill(
-            &mnt_clone, 
-            &stack_clone, 
-            argv, 
-            break_flag_clone.clone(), 
-            "Finishing arch install", 
-            &drawing_area_clone, 
-            &info_clone.clone(), 
-            50.0,
-            "done"
-        );
-    });
+    // let stack_clone = stack.clone();
+    // let break_flag_clone = break_flag.clone();
+    // let mnt_clone = fsgen.clone();
+    // let drawing_area_clone = drawing_area.clone();
+    // let info_clone = info.clone();
+    // // makepart.connect_clicked(move |_| {     
+    // //     let argv = vec!["bash", "-c", "/usr/bin/archin.sh"];
+    // //     termially_ill(
+    // //         &mnt_clone, 
+    // //         &stack_clone, 
+    // //         argv, 
+    // //         break_flag_clone.clone(), 
+    // //         "Finishing arch install", 
+    // //         &drawing_area_clone, 
+    // //         &info_clone.clone(), 
+    // //         50.0,
+    // //         "done"
+    // //     );
+    // // });
 
     // ---------------------------------------------------------------- main box
     stack_box.append(&stack);
