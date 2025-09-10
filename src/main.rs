@@ -417,6 +417,10 @@ fn build_ui(app: &Application) {
             color: rgba(109, 109, 109, 1);
         }
 
+        #info {
+            color: rgba(0, 0, 0, 1);
+        }
+        
         ",
     );
 
@@ -454,6 +458,7 @@ fn build_ui(app: &Application) {
     progressbox.set_valign(gtk4::Align::End);
     progressbox.set_halign(gtk4::Align::Center);
     let info = Label::new(Some("Till cynageOS"));
+    info.set_widget_name("info");
     progressbox.append(&info);
 
     let drawing_area = DrawingArea::builder()
@@ -770,7 +775,7 @@ fn build_ui(app: &Application) {
         let btpr = bootentry.text().to_string();
         let swppr = swapentry.text().to_string();
         stack_clone.set_visible_child_name("mount");        
-        let argv = vec!["bash", "-c", "/usr/bin/archincos.sh", &rtpr, &btpr, &swppr];
+        let argv = vec!["bash", "/usr/bin/archincos.sh", &rtpr, &btpr, &swppr];
         termially_ill(
             &mnt_clone, 
             &stack_clone, 
