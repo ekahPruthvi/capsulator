@@ -57,7 +57,7 @@ echo "Selected locale: $LOCALE"
 BOOTLOADER_NAME="cynageOS"
 
 echo "Pacstrapping base system..."
-pacstrap -i /mnt base base-devel linux linux-firmware git sudo htop $UCODE nano vim bluez bluez-utils networkmanager
+pacstrap -i /mnt base base-devel linux linux-firmware git sudo htop $UCODE nano fzf vim bluez bluez-utils networkmanager
 
 echo "Generating fstab..."
 genfstab -U /mnt >> /mnt/etc/fstab

@@ -21,6 +21,8 @@
 author: ekahPruthvi <ekahpdp@gmail.com>
 github: https://github.com/ekahPruthvi/cynageOS.git
 
-type 'capper' to begin cynageOSv5 installation 
+To begin the cynageOSv5 installation, first connect your device to the 
+internet using a wired Ethernet connection, then type 'capper'. 
+If you are using WiFi, simply type 'capper' to start the installation process.
 or use this live arch image to fix your install
 
