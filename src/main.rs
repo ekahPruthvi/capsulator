@@ -477,7 +477,7 @@ fn build_ui(app: &Application) {
     wifibox.set_widget_name("inbox");
     wifibox.set_vexpand(false);
     wifibox.set_hexpand(false);
-    wifibox.set_size_request(500, 500);
+    wifibox.set_size_request(500, 300);
     wifibox.set_valign(gtk4::Align::Center);
     wifibox.set_halign(gtk4::Align::Center);
 

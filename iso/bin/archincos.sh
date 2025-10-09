@@ -1,5 +1,6 @@
 #!/bin/bash
-
+# buit for cynageOS but can also be used to install arch Linux
+# ekahPruthvi <https://github.com/ekahPruthvi>
 # Usage: ./archincos.sh <root_partition> <boot_partition> [swap_partition]
 
 ROOT="$1"
@@ -132,7 +133,3 @@ arch-chroot /mnt /root/chroot_setup.sh
 
 echo "Cleaning chroot setup script..."
 rm /mnt/root/chroot_setup.sh
-
-echo "Unmounting and shutting down..."
-umount -lR /mnt
-shutdown now
