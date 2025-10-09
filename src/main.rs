@@ -582,9 +582,9 @@ fn build_ui(app: &Application) {
 
     // ---------------------------------------------------------------- 2n page
     let up_box = GtkBox::new(Orientation::Vertical, 5);
-    up_box.set_vexpand(false);
-    up_box.set_hexpand(false);
-    up_box.set_size_request(500, 500);
+    up_box.set_vexpand(true);
+    up_box.set_hexpand(true);
+    // up_box.set_size_request(500, 500);
     up_box.set_valign(gtk4::Align::Center);
     up_box.set_halign(gtk4::Align::Center);
 
@@ -616,9 +616,9 @@ fn build_ui(app: &Application) {
     let break_flag = Arc::new(AtomicBool::new(false));
     let pacman = GtkBox::new(Orientation::Vertical, 5);
     pacman.set_widget_name("inbox-dark");
-    pacman.set_vexpand(false);
-    pacman.set_hexpand(false);
-    pacman.set_size_request(500, 500);
+    pacman.set_vexpand(true);
+    pacman.set_hexpand(true);
+    // pacman.set_size_request(500, 500);
     pacman.set_valign(gtk4::Align::Center);
     pacman.set_halign(gtk4::Align::Center);
 
@@ -649,9 +649,9 @@ fn build_ui(app: &Application) {
     // ---------------------------------------------------------------- 4t page
     let part = GtkBox::new(Orientation::Vertical, 5);
     part.set_widget_name("inbox-dark");
-    part.set_vexpand(false);
-    part.set_hexpand(false);
-    part.set_size_request(500, 700);
+    part.set_vexpand(true);
+    part.set_hexpand(true);
+    // part.set_size_request(500, 700);
     part.set_valign(gtk4::Align::Center);
     part.set_halign(gtk4::Align::Center);
     stack.add_named(&part, Some("partinfo"));
@@ -688,9 +688,9 @@ fn build_ui(app: &Application) {
     // ---------------------------------------------------------------- 5t page
     let format = GtkBox::new(Orientation::Horizontal, 5);
     format.set_widget_name("inbox-dark");
-    format.set_vexpand(false);
-    format.set_hexpand(false);
-    format.set_size_request(900, 500);
+    format.set_vexpand(true);
+    format.set_hexpand(true);
+    // format.set_size_request(900, 500);
     format.set_valign(gtk4::Align::Center);
     format.set_halign(gtk4::Align::Center);
     stack.add_named(&format, Some("formatpart"));
@@ -757,9 +757,9 @@ fn build_ui(app: &Application) {
     // ---------------------------------------------------------------- 6t page
     let mount = GtkBox::new(Orientation::Horizontal, 5);
     mount.set_widget_name("inbox-dark");
-    mount.set_vexpand(false);
-    mount.set_hexpand(false);
-    mount.set_size_request(900, 500);
+    mount.set_vexpand(true);
+    mount.set_hexpand(true);
+    // mount.set_size_request(900, 500);
     mount.set_valign(gtk4::Align::Center);
     mount.set_halign(gtk4::Align::Center);
 
@@ -791,35 +791,39 @@ fn build_ui(app: &Application) {
 
 
     // ---------------------------------------------------------------- 7t page
-    // let fsgen = GtkBox::new(Orientation::Horizontal, 5);
-    // fsgen.set_widget_name("inbox-dark");
-    // fsgen.set_vexpand(false);
-    // fsgen.set_hexpand(false);
+    let fsgen = GtkBox::new(Orientation::Horizontal, 5);
+    fsgen.set_widget_name("inbox-dark");
+    fsgen.set_vexpand(true);
+    fsgen.set_hexpand(true);
     // fsgen.set_size_request(900, 500);
-    // fsgen.set_valign(gtk4::Align::Center);
-    // fsgen.set_halign(gtk4::Align::Center);
+    fsgen.set_valign(gtk4::Align::Center);
+    fsgen.set_halign(gtk4::Align::Center);
 
-    // stack.add_named(&fsgen, Some("generatefs"));
+    stack.add_named(&fsgen, Some("generatefs"));
 
-    // let stack_clone = stack.clone();
-    // let break_flag_clone = break_flag.clone();
-    // let mnt_clone = fsgen.clone();
-    // let drawing_area_clone = drawing_area.clone();
-    // let info_clone = info.clone();
-    // // makepart.connect_clicked(move |_| {     
-    // //     let argv = vec!["bash", "-c", "/usr/bin/archin.sh"];
-    // //     termially_ill(
-    // //         &mnt_clone, 
-    // //         &stack_clone, 
-    // //         argv, 
-    // //         break_flag_clone.clone(), 
-    // //         "Finishing arch install", 
-    // //         &drawing_area_clone, 
-    // //         &info_clone.clone(), 
-    // //         50.0,
-    // //         "done"
-    // //     );
-    // // });
+    let stack_clone = stack.clone();
+    let break_flag_clone = break_flag.clone();
+    let mnt_clone = fsgen.clone();
+    let drawing_area_clone = drawing_area.clone();
+    let info_clone = info.clone();
+    glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
+        if stack_clone.visible_child_name() == Some("formatpart".into()) {    
+            let argv = vec!["bash", "-c", "/usr/bin/cynsetupcos.sh"];
+            termially_ill(
+                &mnt_clone, 
+                &stack_clone, 
+                argv, 
+                break_flag_clone.clone(), 
+                "Settingup Your install", 
+                &drawing_area_clone, 
+                &info_clone.clone(), 
+                90.0,
+                "done"
+            );
+            return glib::ControlFlow::Break;
+        }
+        glib::ControlFlow::Continue
+    });
 
     // ---------------------------------------------------------------- main box
     stack_box.append(&stack);
