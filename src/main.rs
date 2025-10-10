@@ -825,6 +825,25 @@ fn build_ui(app: &Application) {
         glib::ControlFlow::Continue
     });
 
+    // ---------------------------------------------------------------- 7t page
+    let done = GtkBox::new(Orientation::Horizontal, 5);
+    done.set_widget_name("inbox-dark");
+    done.set_vexpand(true);
+    done.set_hexpand(true);
+    // done.set_size_request(900, 500);
+    done.set_valign(gtk4::Align::Center);
+    done.set_halign(gtk4::Align::Center);
+
+    stack.add_named(&done, Some("done"));
+    let stack_clone = stack.clone();
+    glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
+        if stack_clone.visible_child_name() == Some("formatpart".into()) {    
+            // put done 
+            return glib::ControlFlow::Break;
+        }
+        glib::ControlFlow::Continue
+    });
+
     // ---------------------------------------------------------------- main box
     stack_box.append(&stack);
     main_box.append(&stack_box);
