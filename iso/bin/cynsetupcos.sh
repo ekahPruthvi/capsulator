@@ -2,11 +2,13 @@
 # setup files for cynageOS 
 # ekahPruthvi <https://github.com/ekahPruthvi>
 
+set -e
+
 cat << EOF
-       %%%%%####********+++++++++++++++++++******########%%%%%%%%%%%%%%%%%%%%%%%%%#
-    @@@%%%####************++++++++++++++++++++++******########%%%%%%%%%%%%%%%%%%%%%%%#%#
-   @%%%%%%%%####*********++++++++++++++++++++++++*******########%%%#%%%%%%%%%%%%%%%%%%####
- @@@%%%%%%#####***********+*+++++++++++++++++++++*++******#*########%%%%%%%%%%%%%%%%%%#####
+@@@@@%%%%%%%%%####********+++++++++++++++++++******########%%%%%%%%%%%%%%%%%%%%%%%%%##%######
+@@@@@@@%%%####************++++++++++++++++++++++******########%%%%%%%%%%%%%%%%%%%%%%%#%######
+@@@@%%%%%%%%####*********++++++++++++++++++++++++*******########%%%#%%%%%%%%%%%%%%%%%%#######
+@@@@%%%%%%#####***********+*+++++++++++++++++++++*++******#*########%%%%%%%%%%%%%%%%%%#######
 @@@@%%%%%%######************+**+**++++++++++*+**++++++*****############%%%%%%%%%%%%%%########
 @@%%%%######******************+++++++++++++++++++++++++++******#########%%#%%%%%##%%%########
 @@%%%########*******************++++++++++++++++++++++++++++++*+****########%%%%%##%%########
@@ -53,14 +55,210 @@ cat << EOF
 ******++++++++++++++=================================================+===++++***####%%%%####*
 ******+++++++++++++++===============================================+==+++++****###%%%#####**
 ******++++++++++++++=================================================+=+++++***###%%%########
-*****+++++++++++++======+==============================-===============+++++**###%%%########
- **+*+++++++++++++==+===================================-========-=====+++++**##%%%########
-  *+++++++++++++++===================================-=-=-===----=====+=+++**##%%%########
-    ++++++++++++++=====+===========================-=-=-==---==--===++++=+**##%%%%######
-      ++++*+++======+=++===============================----=-=--=====++++**##%%%%###
+*****+++++++++++++======+==============================-===============+++++**###%%%#########
+***+*+++++++++++++==+===================================-========-=====+++++**##%%%##########
+***+++++++++++++++===================================-=-=-===----=====+=+++**##%%%###########
+****++++++++++++++=====+===========================-=-=-==---==--===++++=+**##%%%%###########
+**++++++++*+++======+=++===============================----=-=--=====++++**##%%%%############
 EOF
 
+if ! command -v yay &>/dev/null; then
+  git clone https://aur.archlinux.org/yay.git /tmp/yay
+  cd /tmp/yay
+  makepkg -si --noconfirm
+  cd -
+fi
 
+DRIVERS=()
+if lspci | grep -E -i 'nvidia|geforce'; then
+    DRIVERS=(nvidia-open nvidia-utils lib32-nvidia-utils)
+elif lspci | grep -E -i 'amd|ati|radeon'; then
+    DRIVERS=(xf86-video-amdgpu mesa lib32-mesa)    
+fi
+
+PKGLIST=(
+ani-cli
+archiso
+ark
+asusctl
+base
+base-devel
+bc
+blueman
+bluez
+bluez-utils
+brightnessctl
+cage
+cava
+cliphist
+code
+cpio
+cups-pdf
+dnsmasq
+dosfstools
+dunst
+efibootmgr
+espeak-ng
+eza
+ffmpegthumbs
+flatpak
+fuse2
+git
+greetd
+grimblast-git
+grub
+gst-plugin-pipewire
+gst-plugins-base
+gtk4-layer-shell
+hostapd
+htop
+hyprland
+hyprpicker
+hyprshot
+i2c-tools
+imagemagick
+inkscape
+intel-ucode
+iw
+jq
+kde-cli-tools
+kdeconnect
+kitty
+kvantum
+kvantum-qt5
+lavat-git
+libconfig
+libev
+libnotify
+libresprite
+linux
+linux-firmware
+linux-headers
+loupe
+man-db
+mariadb
+mpv
+mtools
+nano
+nautilus
+neofetch
+netdiscover
+network-manager-applet
+networkmanager
+noto-fonts-emoji
+nvidia-open
+nvidia-utils
+nwg-look
+oh-my-zsh-git
+os-prober
+pacman-contrib
+pam-python
+pamixer
+parallel
+pavucontrol
+peaclock
+php
+pipewire
+pipewire-alsa
+pipewire-audio
+pipewire-jack
+pipewire-pulse
+playerctl
+pokemon-colorscripts-git
+polkit-kde-agent
+pv
+pyprland
+python-pypdf
+qt5-graphicaleffects
+qt5-imageformats
+qt5-quickcontrols
+qt5-quickcontrols2
+qt5-wayland
+qt5ct
+qt6-virtualkeyboard
+qt6-wayland
+qt6ct
+rofi-lbonn-wayland-git
+rpi-imager
+rustup
+sddm
+slurp
+smassh-bin
+sox
+stremio
+sudo
+swww
+system-config-printer
+tk
+ttf-bigblueterminal-nerd
+ttf-heavydata-nerd
+udiskie
+usbutils
+uthash
+v4l-utils
+vim
+vivaldi
+vte4
+wev
+wf-recorder
+wget
+wireplumber
+xdg-desktop-portal-gtk
+xdg-desktop-portal-hyprland
+xf86-video-vesa
+xorg-bdftopcf
+xorg-docs
+xorg-font-util
+xorg-fonts-100dpi
+xorg-fonts-75dpi
+xorg-iceauth
+xorg-mkfontscale
+xorg-server-devel
+xorg-server-xephyr
+xorg-server-xnest
+xorg-server-xvfb
+xorg-sessreg
+xorg-smproxy
+xorg-x11perf
+xorg-xbacklight
+xorg-xcmsdb
+xorg-xcursorgen
+xorg-xdpyinfo
+xorg-xdriinfo
+xorg-xev
+xorg-xgamma
+xorg-xhost
+xorg-xinput
+xorg-xkbevd
+xorg-xkbutils
+xorg-xkill
+xorg-xlsatoms
+xorg-xlsclients
+xorg-xmodmap
+xorg-xpr
+xorg-xrandr
+xorg-xrdb
+xorg-xrefresh
+xorg-xsetroot
+xorg-xvinfo
+xorg-xwd
+xorg-xwininfo
+xorg-xwud
+yay
+youtube-music
+zsh-autosuggestions-git
+zsh-syntax-highlighting-git
+zsh-theme-powerlevel10k-git
+"${DRIVERS[@]}"
+)
+
+# check and remove drivers (nvidia)
+
+# clean the list
+
+# ascii text to show wat im doing 
+
+yay -S --needed --noconfirm "${PKGLIST[@]}"
 
 echo "Unmounting and Finishing up"
 umount -lR /mnt
