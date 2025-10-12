@@ -62,7 +62,18 @@ EOF
 read -p "Enter your username: " USERNAME
 read -p "Enter your computer name (hostname): " COMPUTERNAME
 
+if [[ "$USERNAME" == "pdp" || "$USERNAME" == "ekah" ]]; then
+    cat << EOF
+hello creator
+EOF
+elif [[ "$USERNAME" == "chnads" || "$USERNAME" == "murgi" ]]; then
+    cat << EOF
+hello creator 2 
+EOF
+fi
 
+# chages rewquired
+# make em YESSS
 
 LOCALE=$(cat /usr/share/i18n/SUPPORTED | fzf | cut -d ' ' -f1)
 echo "Selected locale: $LOCALE"
