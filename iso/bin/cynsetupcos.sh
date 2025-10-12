@@ -180,7 +180,7 @@ usbutils
 uthash
 v4l-utils
 vim
-vivaldi
+zen-browser
 vte4
 wev
 wf-recorder
