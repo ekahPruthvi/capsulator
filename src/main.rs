@@ -838,7 +838,7 @@ fn build_ui(app: &Application) {
     let stack_clone = stack.clone();
     glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
         if stack_clone.visible_child_name() == Some("formatpart".into()) {    
-            // put done and shutdown now
+            let _ = Command::new("shutdown now");
             return glib::ControlFlow::Break;
         }
         glib::ControlFlow::Continue
