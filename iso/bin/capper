@@ -3,9 +3,10 @@
 
 set -e
 
-echo -e "\e[31mgetting your system ready\e[0m"
+echo -e "\e[31mGetting your system ready and installing cage wayland kiosk\e[0m"
 
-pacman -U --noconfirm /var/lib/cos/cage-0.2.0/cage-0.2.0-3-x86_64.pkg.tar.zst
+pacman -U --noconfirm /var/lib/cos/backend/wlroots0.19-0.19.1-2-x86_64.pkg.tar.zst
+pacman -U --noconfirm /var/lib/cos/backend/cage-0.2.0-3-x86_64.pkg.tar.zst
 
 NetworkManager
 cage cap

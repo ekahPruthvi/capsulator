@@ -2,7 +2,7 @@
 # shellcheck disable=SC2034
 
 iso_name="cynageOSv5"
-iso_label="cosv5_alpha$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m)"
+iso_label="cosv5_alpha2_$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m)"
 iso_publisher="ekahPruthvi <ekahpdp@gmail.com>"
 iso_application="CynageOS Linux Live/Rescue DVD"
 iso_version="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y.%m.%d)"
