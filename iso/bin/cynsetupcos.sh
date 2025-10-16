@@ -101,7 +101,6 @@ blueman
 bluez
 bluez-utils
 brightnessctl
-cage
 cava
 cliphist
 code
@@ -263,6 +262,8 @@ cat << EOF
 EOF
 
 sleep 1s
+
+## copy confis
 
 echo "Unmounting and Finishing up"
 umount -lR /mnt
