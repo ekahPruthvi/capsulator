@@ -1,8 +1,15 @@
 alsa-utils
+meson
+gcc
+ninja
 gtk4
 gtk4-layer-shell
 vte4
 networkmanager
+pango
+gdk-pixbuf2
+cairo
+glib2
 amd-ucode
 arch-install-scripts
 archinstall

@@ -1,4 +1,11 @@
 #!/bin/bash
+# Startup job for the install
+
+set -e
+
+echo -e "\e[31mgetting your system ready\e[0m"
+
+pacman -U --noconfirm /var/lib/cos/cage-0.2.0/cage-0.2.0-3-x86_64.pkg.tar.zst
 
 NetworkManager
 cage cap
