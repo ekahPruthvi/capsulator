@@ -5,6 +5,10 @@ set -e
 
 echo -e "\e[31mGetting your system ready and installing cage wayland kiosk\e[0m"
 
+nmtui
+
+# give internet and connect before running these
+
 pacman -U --noconfirm /var/lib/cos/backend/wlroots0.19-0.19.1-2-x86_64.pkg.tar.zst
 pacman -U --noconfirm /var/lib/cos/backend/cage-0.2.0-3-x86_64.pkg.tar.zst
 
