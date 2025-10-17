@@ -807,7 +807,7 @@ fn build_ui(app: &Application) {
     let drawing_area_clone = drawing_area.clone();
     let info_clone = info.clone();
     glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
-        if stack_clone.visible_child_name() == Some("formatpart".into()) {    
+        if stack_clone.visible_child_name() == Some("generatefs".into()) {    
             let argv = vec!["bash", "-c", "/usr/bin/cynsetupcos.sh"];
             termially_ill(
                 &mnt_clone, 
@@ -837,7 +837,7 @@ fn build_ui(app: &Application) {
     stack.add_named(&done, Some("done"));
     let stack_clone = stack.clone();
     glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
-        if stack_clone.visible_child_name() == Some("formatpart".into()) {    
+        if stack_clone.visible_child_name() == Some("done".into()) {
             let _ = Command::new("shutdown now");
             return glib::ControlFlow::Break;
         }
