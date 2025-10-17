@@ -110,6 +110,8 @@ genfstab -U /mnt >> /mnt/etc/fstab
 echo "Resulting /mnt/etc/fstab:"
 cat /mnt/etc/fstab
 
+cp /var/lib/cos/backend/wlroots0.19-0.19.1-2-x86_64.pkg.tar.zst /var/lib/cos/backend/cage-0.2.0-3-x86_64.pkg.tar.zst /mnt/root/
+
 cat <<EOF > /mnt/root/chroot_setup.sh
 #!/bin/bash
 set -e

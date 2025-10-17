@@ -88,7 +88,7 @@ DRIVERS=()
 if lspci | grep -E -i 'nvidia|geforce'; then
     DRIVERS=(nvidia-open nvidia-utils lib32-nvidia-utils)
 elif lspci | grep -E -i 'amd|ati|radeon'; then
-    DRIVERS=(xf86-video-amdgpu mesa lib32-mesa)    
+    DRIVERS=(xf86-video-amdgpu lib32-mesa)    
 fi
 
 PKGLIST=(
@@ -186,6 +186,7 @@ sox
 sudo
 swww
 system-config-printer
+systemd
 tk
 ttf-bigblueterminal-nerd
 ttf-heavydata-nerd
@@ -244,10 +245,40 @@ xorg-xwud
 zsh-autosuggestions-git
 zsh-syntax-highlighting-git
 zsh-theme-powerlevel10k-git
+xcb-util-renderutil
+xcb-util-wm
+xcb-util-errors
+wayland
+wayland-protocols
+egl-wayland
+libglvnd
+vulkan-icd-loader
+vulkan-headers
+glslang
+libdrm
+libinput
+libxkbcommon
+pixman
+seatd
+hwdata
+libdisplay-info
+libliftoff
+xorg-xwayland
+libxkbcommon
+gtk4
+gtk4-layer-shell
+vte4
+mesa
 "${DRIVERS[@]}"
 )
 
 yay -S --needed --noconfirm "${PKGLIST[@]}"
+
+pacman -U --noconfirm /mnt/root/wlroots0.19-0.19.1-2-x86_64.pkg.tar.zst 
+pacman -U --noconfirm /mnt/root/cage-0.2.0-3-x86_64.pkg.tar.zst 
+
+echo "Delisting cage from updates"
+echo "IgnorePkg = cage" | sudo tee -a /mnt/root/etc/pacman.conf
 
 cat << EOF
 
