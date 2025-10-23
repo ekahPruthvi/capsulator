@@ -23,12 +23,12 @@
 > ### 5
 >> mount and install arch linux
 >> set user and password
->> script: archincos.sh
+>> <br>script: archincos.sh
 > ### 6
 >> Install dependecies and required programs
 >> setup cynenv programs
 >> finish configs
->> script: cynsetupcos.sh
+>> <br>script: cynsetupcos.sh
 > ### 7
 >> Finish
 >> Information
