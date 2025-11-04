@@ -1,5 +1,72 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 mkdir -p $HOME/cynageiso
 cp -r /usr/share/archiso/configs/releng $HOME/cynageiso/cos/
 cp /etc/os-release $HOME/cynageiso/cos/airootfs/etc/os-release
+
+# PROFILEDEF.SH
+PROFILEDEF="$HOME/cynageiso/cos/profiledef.sh"
+
+read -rp "Enter the version number (e.g., 5): " version
+read -rp "Enter the release type (e.g., alpha2 or stable): " release_type
+
+new_iso_name="cynageOSv$version"
+new_iso_label="cosv${version}_${release_type}_\$(date --date=\"@${SOURCE_DATE_EPOCH:-\$(date +%s)}\" +%Y%m)"
+new_iso_publisher='ekahPruthvi <ekahpdp@gmail.com>'
+new_iso_application='CynageOS Linux Live/Rescue DVD (arch)'
+
+sed -i -E \
+  -e "s/^iso_name=.*/iso_name=\"$new_iso_name\"/" \
+  -e "s/^iso_label=.*/iso_label=\"$new_iso_label\"/" \
+  -e "s/^iso_publisher=.*/iso_publisher=\"$new_iso_publisher\"/" \
+  -e "s/^iso_application=.*/iso_application=\"$new_iso_application\"/" \
+  "$PROFILEDEF"
+
+new_entries='  \[\"/usr/bin/capper\"\]=\"0:0:755\"\
+  \[\"/usr/bin/cap\"\]=\"0:0:755\"\
+  \[\"/usr/bin/archincos.sh\"\]=\"0:0:755\"\
+  \[\"/usr/bin/cynsetupcos.sh\"\]=\"0:0:755\"'
+
+sed -i "/file_permissions=(/,/)/ {
+  /)/ i\\
+$new_entries
+}" "$PROFILEDEF"
+
+echo "Entries added to file_permissions in $PROFILEDEF" && sleep 3s
+
+# packages.x86_64
+cat <<EOF >> /home/ekah/cynageiso/cos/packages.x86_64
+gcc
+meson
+mesa
+xcb-util-renderutil
+xcb-util-wm
+xcb-util-errors
+wayland
+wayland-protocols
+egl-wayland
+libglvnd
+vulkan-icd-loader
+vulkan-headers
+glslang
+libdrm
+libinput
+libxkbcommon
+pixman
+seatd
+hwdata
+libdisplay-info
+libliftoff
+xorg-xwayland
+libxkbcommon
+gtk4
+gtk4-layer-shell
+vte4
+networkmanager
+pango
+gdk-pixbuf2
+cairo
+glib2
+EOF
+
+
