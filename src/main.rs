@@ -68,7 +68,7 @@ fn is_connected() -> bool {
     stdout.trim() == "connected"
 }
 
-fn termially_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Arc<AtomicBool>, text: &str, drawing_area: &DrawingArea, info: &Label, percent: f64, next: &str) {
+fn terminally_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Arc<AtomicBool>, text: &str, drawing_area: &DrawingArea, info: &Label, percent: f64, next: &str) {
     while let Some(child) = boxxy.first_child() {
         boxxy.remove(&child);
     }
@@ -631,7 +631,7 @@ fn build_ui(app: &Application) {
     start.connect_clicked(move |_| {
         stack_clone.set_visible_child_name("pacman");        
         let argv = vec!["bash", "-c", "sudo pacman -Sy && sudo pacman -Sy archlinux-keyring"];
-        termially_ill(
+        terminally_ill(
             &pacman_clone, 
             &stack_clone, 
             argv, 
@@ -664,7 +664,7 @@ fn build_ui(app: &Application) {
         if stack_clone_4th.visible_child_name() == Some("partinfo".into()) {
             break_flag_clone_4th.set(false);
             let argv = vec!["bash"];
-            termially_ill(
+            terminally_ill(
                 &part, 
                 &stack_clone_4th, 
                 argv, 
@@ -776,7 +776,7 @@ fn build_ui(app: &Application) {
         let swppr = swapentry.text().to_string();
         stack_clone.set_visible_child_name("mount");        
         let argv = vec!["bash", "/usr/bin/archincos.sh", &rtpr, &btpr, &swppr];
-        termially_ill(
+        terminally_ill(
             &mnt_clone, 
             &stack_clone, 
             argv, 
@@ -809,7 +809,7 @@ fn build_ui(app: &Application) {
     glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
         if stack_clone.visible_child_name() == Some("generatefs".into()) {    
             let argv = vec!["bash", "-c", "/usr/bin/cynsetupcos.sh"];
-            termially_ill(
+            terminally_ill(
                 &mnt_clone, 
                 &stack_clone, 
                 argv, 
