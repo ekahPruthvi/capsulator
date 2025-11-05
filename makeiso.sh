@@ -81,7 +81,11 @@ sed -i -E \
 sed -i -E "s|^title\s+Arch Linux install medium \(.*\)|title    CynageOS Linux install medium (arch, UEFI)|" "/home/ekah/cynageiso/cos/efiboot/loader/entries/01-archiso-linux.conf"
 
 # AIROOTFS
-cp -r "$PWD/iso/bin" "$HOME/cynageiso/cos/airootfs/usr"
-cp -r "$PWD/iso/var" "$HOME/cynageiso/cos/airootfs"
+cp -r "$PWD/iso/bin" "$HOME/cynageiso/cos/airootfs/usr/"
+cp -r "$PWD/iso/var" "$HOME/cynageiso/cos/airootfs/"
+
+cargo build -release && mv "$PWD/target/release/cap" "$HOME/cynageiso/cos/airootfs/usr/bin/"
+
+##### still hav to edit shi in etc 
 
 
