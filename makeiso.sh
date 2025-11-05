@@ -35,7 +35,7 @@ $new_entries
 echo "Entries added to file_permissions in $PROFILEDEF" && sleep 3s
 
 # packages.x86_64
-cat <<EOF >> /home/ekah/cynageiso/cos/packages.x86_64
+cat <<EOF >> $HOME/cynageiso/cos/packages.x86_64
 gcc
 meson
 mesa
@@ -69,4 +69,15 @@ cairo
 glib2
 EOF
 
-# 
+# splash
+rm $HOME/cynageiso/cos/syslinux/splash.png
+
+# archiso head
+sed -i -E \
+  -e "s/^MENU TITLE Arch Linux.*/MENU TITLE CynageOS Linux/" \
+  "$HOME/cynageiso/cos/syslinux/archiso_head.cfg"
+
+# efibootloader
+sed -i -E "s|^title\s+Arch Linux install medium \(.*\)|title    CynageOS Linux install medium (arch, UEFI)|" "/home/ekah/cynageiso/cos/efiboot/loader/entries/01-archiso-linux.conf"
+
+
