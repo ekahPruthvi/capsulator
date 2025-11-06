@@ -17,6 +17,8 @@ new_iso_label="cosv${version}_${release_type}_\$(date --date=\"@${SOURCE_DATE_EP
 new_iso_publisher='ekahPruthvi <ekahpdp@gmail.com>'
 new_iso_application='CynageOS Linux Live/Rescue DVD (arch)'
 
+##### BUGG HERE
+
 sed -i -E \
   -e "s/^iso_name=.*/iso_name=\"$new_iso_name\"/" \
   -e "s/^iso_label=.*/iso_label=\"$new_iso_label\"/" \
