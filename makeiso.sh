@@ -35,7 +35,7 @@ sed -i "/file_permissions=(/,/)/ {
 $new_entries
 }" "$PROFILEDEF"
 
-echo "Entries added to file_permissions in $PROFILEDEF" && sleep 3s
+echo "Adding entries to file_permissions in $PROFILEDEF" && sleep 3s
 
 # packages.x86_64
 cat <<EOF >> $HOME/cynageiso/cos/packages.x86_64
@@ -72,6 +72,8 @@ cairo
 glib2
 EOF
 
+echo "Appeding required packages" && sleep 3s
+
 # splash
 rm $HOME/cynageiso/cos/syslinux/splash.png
 
@@ -89,6 +91,8 @@ cp -r "$BaseDir/iso/var" "$HOME/cynageiso/cos/airootfs/"
 
 cd $BaseDir
 cargo build --release && mv "$BaseDir/target/release/cap" "$HOME/cynageiso/cos/airootfs/usr/bin/"
+
+echo "Managing permissions and creating the MOTD" && sleep 3s
 
 # etc
 echo "cynageOS" > "$HOME/cynageiso/cos/airootfs/etc/hostname"
@@ -133,61 +137,13 @@ LOGO=cos-logo
 DOCUMENTATION_URL="https://ekahpruthvi.github.io/StertorusPages/blogs/notes.html"
 EOF
 
-copyanim(){
-    local ROW=$(tput lines)
-    clear_win
-    local ctext="   █▀▀▀▀▀▄"
-    local cwidth=$(tput cols)
-    local cpadding=$(( (cwidth - ${#ctext}) / 2 ))
-    for ((i=0;i<2;i++)) do
-        clear
-        tput cup $(( (ROW / 2) - 4 ))
-        printf "%${cpadding}s\033[?25l╔█▀▀▀▀▀▄\n"
-        printf "%${cpadding}s║█     █\n"
-        printf "%${cpadding}s║█#####█\n"
-        printf "%${cpadding}s║█▄▄▄▄▄█\n"
-        printf "%${cpadding}s╚══════╝\n"
-        sleep 0.3
-        clear
-        tput cup $(( (ROW / 2) - 4 ))
-        printf "%${cpadding}s\033[?25l  █▀▀▀▀▀▄\n"
-        printf "%${cpadding}s╔═█     █\n"
-        printf "%${cpadding}s║ █#####█\n"
-        printf "%${cpadding}s║ █▄▄▄▄▄█\n"
-        printf "%${cpadding}s║      ║\n"
-        printf "%${cpadding}s╚══════╝\n"
-        sleep 0.3
-        clear
-        tput cup $(( (ROW / 2) - 4 ))
-        printf "%${cpadding}s\033[?25l   █▀▀▀▀▀▄\n"
-        printf "%${cpadding}s╔═════─┐ █\n"
-        printf "%${cpadding}s║  █###│#█\n"
-        printf "%${cpadding}s║  █▄▄▄║▄█\n"
-        printf "%${cpadding}s║      ║\n"
-        printf "%${cpadding}s╚══════╝\n"
-        sleep 0.3
-        clear
-        tput cup $(( (ROW / 2) - 4 ))
-        printf "%${cpadding}s\033[?25l  █▀▀▀▀▀▄\n"
-        printf "%${cpadding}s╔═════─┐█\n"
-        printf "%${cpadding}s║ █####│█\n"
-        printf "%${cpadding}s║ █▄▄▄▄║█\n"
-        printf "%${cpadding}s║      ║\n"
-        printf "%${cpadding}s╚══════╝\n"
-        sleep 0.3
-    done
-}
+echo "Getting files redy for mkarchiso" && sleep 3s
 
-copyanim 
+echo "Starting mkarchiso" && sleep 3s
 
-printf " ▓█████▄  ▒█████   ███▄    █ ▓█████▓█████ ▐██▌  ▐██▌
- ▒██▀ ██▌▒██▒  ██▒ ██ ▀█   █ ▓█   ▀▓█   ▀ ▐██▌  ▐██▌
- ░██   █▌▒██░  ██▒▓██  ▀█ ██▒▒███  ▒███   ▐██▌  ▐██▌     
-▒░▓█▄   ▌▒██   ██░▓██▒  ▐▌██▒▒▓█  ▄▒▓█  ▄ ▓██▒  ▓██▒     
-░░▒████▓ ░ ████▓▒░▒██░   ▓██░░▒████░▒████ ▒▄▄   ▒▄▄      
-░ ▒▒▓  ▒ ░ ▒░▒░▒░ ░ ▒░   ▒ ▒ ░░ ▒░ ░░ ▒░  ░▀▀▒  ░▀▀▒     
-  ░ ▒  ▒   ░ ▒ ▒░ ░ ░░   ░ ▒░ ░ ░   ░ ░   ░  ░  ░  ░     
-  ░ ░  ░ ░ ░ ░ ▒     ░   ░ ░    ░     ░      ░     ░     
-    ░        ░ ░           ░    ░     ░   ░     ░   "     
+cd "$HOME/cynageiso/cos/"
+sudo mkarchiso -v .
+
+
 
 
