@@ -90,7 +90,7 @@ cp -r "$BaseDir/iso/bin" "$HOME/cynageiso/cos/airootfs/usr/"
 cp -r "$BaseDir/iso/var" "$HOME/cynageiso/cos/airootfs/"
 
 cd $BaseDir
-cargo build --release && mv "$BaseDir/target/release/cap" "$HOME/cynageiso/cos/airootfs/usr/bin/"
+cargo build --release && mv "$BaseDir/target/release/cap" "$HOME/cynageiso/cos/airootfs/usr/bin/" && cargo clean
 
 echo "Managing permissions and creating the MOTD" && sleep 3s
 
