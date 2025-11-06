@@ -3,4 +3,5 @@ PRETTY_NAME="cynageOS"
 ID=arch
 BUILD_ID=rolling
 ANSI_COLOR="38;2;23;147;209"
-LOGO=cos
+LOGO=cos-logo
+DOCUMENTATION_URL="https://ekahpruthvi.github.io/StertorusPages/blogs/notes.html"

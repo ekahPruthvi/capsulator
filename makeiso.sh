@@ -25,6 +25,7 @@ sed -i -E \
 new_entries='  \[\"/usr/bin/capper\"\]=\"0:0:755\"\
   \[\"/usr/bin/cap\"\]=\"0:0:755\"\
   \[\"/usr/bin/archincos.sh\"\]=\"0:0:755\"\
+  \[\"/usr/bin/cage\"\]=\"0:0:755\"\
   \[\"/usr/bin/cynsetupcos.sh\"\]=\"0:0:755\"'
 
 sed -i "/file_permissions=(/,/)/ {
@@ -86,6 +87,47 @@ cp -r "$PWD/iso/var" "$HOME/cynageiso/cos/airootfs/"
 
 cargo build -release && mv "$PWD/target/release/cap" "$HOME/cynageiso/cos/airootfs/usr/bin/"
 
-##### still hav to edit shi in etc 
+# etc
+echo "cynageOS" > "$HOME/cynageiso/cos/airootfs/etc/hostname"
+
+cat << EOF > $HOME/cynageiso/cos/airootfs/etc/motd
+ ░█░░░█░█▀▀░█░░█▀▄░▄▀▀▄░█▀▄▀█░█▀▀░░░▀█▀░▄▀▀▄░░
+ ░▀▄█▄▀░█▀▀░█░░█░░░█░░█░█░▀░█░█▀▀░░░░█░░█░░█░░
+ ░░▀░▀░░▀▀▀░▀▀░▀▀▀░░▀▀░░▀░░▒▀░▀▀▀░░░░▀░░░▀▀░░░                                                                          
+                                                      ▄▄█▀▀██▄  ▄█▀▀▀█▄█    
+                                                    ▄██▀    ▀██▄██    ▀█    
+ ▄██▀██▀██▀   ▀██▀████████▄  ▄█▀██▄  ▄█▀█████ ▄▄█▀████▀      ▀█████▄        
+██▀  ██  ██   ▄█   ██    ██ ██   ██ ▄██  ██  ▄█▀   ███        ██ ▀█████▄    
+██        ██ ▄█    ██    ██  ▄█████ ▀█████▀  ██▀▀▀▀▀▀█▄      ▄██     ▀██    
+██▄    ▄   ███     ██    ██ ██   ██ ██       ██▄    ▄██▄    ▄██▀█     ██    
+ █████▀    ▄█    ▄████  ████▄████▀██▄███████  ▀█████▀ ▀▀████▀▀ █▀█████▀     
+         ▄█                         █▀     ██                               
+       ██▀                          ██████▀                                 
+
+▒▄▀▄░░░█▀▄▒██▀░█▒█░█▒░░▄▀▄▒█▀▄▒██▀▒█▀▄░░░▄▀▄▒█▀▄░█▒██▀░█▄░█░▀█▀▒██▀░█▀▄░░░▄▀▄▒█▀▄▒██▀▒█▀▄▒▄▀▄░▀█▀░█░█▄░█░▄▀▒░░░▄▀▀░▀▄▀░▄▀▀░▀█▀▒██▀░█▄▒▄█░░
+░█▀█▒░▒█▄▀░█▄▄░▀▄▀▒█▄▄░▀▄▀░█▀▒░█▄▄░█▀▄▒░░▀▄▀░█▀▄░█░█▄▄░█▒▀█░▒█▒░█▄▄▒█▄▀▒░░▀▄▀░█▀▒░█▄▄░█▀▄░█▀█░▒█▒░█░█▒▀█░▀▄█▒░▒▄██░▒█▒▒▄██░▒█▒░█▄▄░█▒▀▒█▒░
+
+░█░░▒█░█░▀█▀░█▄█░░▒▄▀▄░░░▄▀▀░█▒░▒██▀▒██▀░█▄▀░░░█▄▒▄█░▄▀▄▒█▀▄░█▀▄▒██▀▒█▀▄░█▄░█░░░█▒░░▄▀▄░▄▀▄░█▄▀░░
+░▀▄▀▄▀░█░▒█▒▒█▒█▒░░█▀█▒░▒▄██▒█▄▄░█▄▄░█▄▄░█▒█▒░░█▒▀▒█░▀▄▀░█▀▄▒█▄▀░█▄▄░█▀▄░█▒▀█▒░▒█▄▄░▀▄▀░▀▄▀░█▒█░▄
+
+
+author: ekahPruthvi <ekahpdp@gmail.com>
+github: https://github.com/ekahPruthvi/cynageOS.git
+
+To begin the cynageOSv5 installation, first connect your device to the 
+internet using a wired Ethernet connection, then type 'capper'. 
+If you are using WiFi, simply type 'capper' to start the installation process.
+or use this live arch image to fix your install
+EOF
+
+cat << EOF > $HOME/cynageiso/cos/airootfs/etc/os-release
+NAME="cynageOS Linux"
+PRETTY_NAME="cynageOS"
+ID=arch
+BUILD_ID=rolling
+ANSI_COLOR="38;2;23;147;209"
+LOGO=cos-logo
+DOCUMENTATION_URL="https://ekahpruthvi.github.io/StertorusPages/blogs/notes.html"
+EOF
 
 
