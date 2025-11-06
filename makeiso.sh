@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+BaseDir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+
 mkdir -p $HOME/cynageiso
 cp -r /usr/share/archiso/configs/releng $HOME/cynageiso/cos/
 cp /etc/os-release $HOME/cynageiso/cos/airootfs/etc/os-release
@@ -82,10 +84,11 @@ sed -i -E \
 sed -i -E "s|^title\s+Arch Linux install medium \(.*\)|title    CynageOS Linux install medium (arch, UEFI)|" "/home/ekah/cynageiso/cos/efiboot/loader/entries/01-archiso-linux.conf"
 
 # AIROOTFS
-cp -r "$PWD/iso/bin" "$HOME/cynageiso/cos/airootfs/usr/"
-cp -r "$PWD/iso/var" "$HOME/cynageiso/cos/airootfs/"
+cp -r "$BaseDir/iso/bin" "$HOME/cynageiso/cos/airootfs/usr/"
+cp -r "$BaseDir/iso/var" "$HOME/cynageiso/cos/airootfs/"
 
-cargo build -release && mv "$PWD/target/release/cap" "$HOME/cynageiso/cos/airootfs/usr/bin/"
+cd $BaseDir
+cargo build --release && mv "$BaseDir/target/release/cap" "$HOME/cynageiso/cos/airootfs/usr/bin/"
 
 # etc
 echo "cynageOS" > "$HOME/cynageiso/cos/airootfs/etc/hostname"
@@ -129,5 +132,62 @@ ANSI_COLOR="38;2;23;147;209"
 LOGO=cos-logo
 DOCUMENTATION_URL="https://ekahpruthvi.github.io/StertorusPages/blogs/notes.html"
 EOF
+
+copyanim(){
+    local ROW=$(tput lines)
+    clear_win
+    local ctext="   █▀▀▀▀▀▄"
+    local cwidth=$(tput cols)
+    local cpadding=$(( (cwidth - ${#ctext}) / 2 ))
+    for ((i=0;i<2;i++)) do
+        clear
+        tput cup $(( (ROW / 2) - 4 ))
+        printf "%${cpadding}s\033[?25l╔█▀▀▀▀▀▄\n"
+        printf "%${cpadding}s║█     █\n"
+        printf "%${cpadding}s║█#####█\n"
+        printf "%${cpadding}s║█▄▄▄▄▄█\n"
+        printf "%${cpadding}s╚══════╝\n"
+        sleep 0.3
+        clear
+        tput cup $(( (ROW / 2) - 4 ))
+        printf "%${cpadding}s\033[?25l  █▀▀▀▀▀▄\n"
+        printf "%${cpadding}s╔═█     █\n"
+        printf "%${cpadding}s║ █#####█\n"
+        printf "%${cpadding}s║ █▄▄▄▄▄█\n"
+        printf "%${cpadding}s║      ║\n"
+        printf "%${cpadding}s╚══════╝\n"
+        sleep 0.3
+        clear
+        tput cup $(( (ROW / 2) - 4 ))
+        printf "%${cpadding}s\033[?25l   █▀▀▀▀▀▄\n"
+        printf "%${cpadding}s╔═════─┐ █\n"
+        printf "%${cpadding}s║  █###│#█\n"
+        printf "%${cpadding}s║  █▄▄▄║▄█\n"
+        printf "%${cpadding}s║      ║\n"
+        printf "%${cpadding}s╚══════╝\n"
+        sleep 0.3
+        clear
+        tput cup $(( (ROW / 2) - 4 ))
+        printf "%${cpadding}s\033[?25l  █▀▀▀▀▀▄\n"
+        printf "%${cpadding}s╔═════─┐█\n"
+        printf "%${cpadding}s║ █####│█\n"
+        printf "%${cpadding}s║ █▄▄▄▄║█\n"
+        printf "%${cpadding}s║      ║\n"
+        printf "%${cpadding}s╚══════╝\n"
+        sleep 0.3
+    done
+}
+
+copyanim 
+
+printf " ▓█████▄  ▒█████   ███▄    █ ▓█████▓█████ ▐██▌  ▐██▌\n
+ ▒██▀ ██▌▒██▒  ██▒ ██ ▀█   █ ▓█   ▀▓█   ▀ ▐██▌  ▐██▌\n
+ ░██   █▌▒██░  ██▒▓██  ▀█ ██▒▒███  ▒███   ▐██▌  ▐██▌\n     
+▒░▓█▄   ▌▒██   ██░▓██▒  ▐▌██▒▒▓█  ▄▒▓█  ▄ ▓██▒  ▓██▒\n     
+░░▒████▓ ░ ████▓▒░▒██░   ▓██░░▒████░▒████ ▒▄▄   ▒▄▄ \n     
+░ ▒▒▓  ▒ ░ ▒░▒░▒░ ░ ▒░   ▒ ▒ ░░ ▒░ ░░ ▒░  ░▀▀▒  ░▀▀▒\n     
+  ░ ▒  ▒   ░ ▒ ▒░ ░ ░░   ░ ▒░ ░ ░   ░ ░   ░  ░  ░  ░\n     
+  ░ ░  ░ ░ ░ ░ ▒     ░   ░ ░    ░     ░      ░     ░\n     
+    ░        ░ ░           ░    ░     ░   ░     ░   "     
 
 
