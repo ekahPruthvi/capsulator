@@ -17,13 +17,11 @@ new_iso_label="cosv${version}_${release_type}_\$(date --date=\"@${SOURCE_DATE_EP
 new_iso_publisher='ekahPruthvi <ekahpdp@gmail.com>'
 new_iso_application='CynageOS Linux Live/Rescue DVD (arch)'
 
-##### BUGG HERE
-
 sed -i -E \
-  -e "s/^iso_name=.*/iso_name=\"$new_iso_name\"/" \
-  -e "s/^iso_label=.*/iso_label=\"$new_iso_label\"/" \
-  -e "s/^iso_publisher=.*/iso_publisher=\"$new_iso_publisher\"/" \
-  -e "s/^iso_application=.*/iso_application=\"$new_iso_application\"/" \
+  -e "s|^iso_name=.*|iso_name=\"$new_iso_name\"|" \
+  -e "s|^iso_label=.*|iso_label=\"$new_iso_label\"|" \
+  -e "s|^iso_publisher=.*|iso_publisher=\"$new_iso_publisher\"|" \
+  -e "s|^iso_application=.*|iso_application=\"$new_iso_application\"|" \
   "$PROFILEDEF"
 
 new_entries='  \[\"/usr/bin/capper\"\]=\"0:0:755\"\
@@ -182,14 +180,14 @@ copyanim(){
 
 copyanim 
 
-printf " ▓█████▄  ▒█████   ███▄    █ ▓█████▓█████ ▐██▌  ▐██▌\n
- ▒██▀ ██▌▒██▒  ██▒ ██ ▀█   █ ▓█   ▀▓█   ▀ ▐██▌  ▐██▌\n
- ░██   █▌▒██░  ██▒▓██  ▀█ ██▒▒███  ▒███   ▐██▌  ▐██▌\n     
-▒░▓█▄   ▌▒██   ██░▓██▒  ▐▌██▒▒▓█  ▄▒▓█  ▄ ▓██▒  ▓██▒\n     
-░░▒████▓ ░ ████▓▒░▒██░   ▓██░░▒████░▒████ ▒▄▄   ▒▄▄ \n     
-░ ▒▒▓  ▒ ░ ▒░▒░▒░ ░ ▒░   ▒ ▒ ░░ ▒░ ░░ ▒░  ░▀▀▒  ░▀▀▒\n     
-  ░ ▒  ▒   ░ ▒ ▒░ ░ ░░   ░ ▒░ ░ ░   ░ ░   ░  ░  ░  ░\n     
-  ░ ░  ░ ░ ░ ░ ▒     ░   ░ ░    ░     ░      ░     ░\n     
+printf " ▓█████▄  ▒█████   ███▄    █ ▓█████▓█████ ▐██▌  ▐██▌
+ ▒██▀ ██▌▒██▒  ██▒ ██ ▀█   █ ▓█   ▀▓█   ▀ ▐██▌  ▐██▌
+ ░██   █▌▒██░  ██▒▓██  ▀█ ██▒▒███  ▒███   ▐██▌  ▐██▌     
+▒░▓█▄   ▌▒██   ██░▓██▒  ▐▌██▒▒▓█  ▄▒▓█  ▄ ▓██▒  ▓██▒     
+░░▒████▓ ░ ████▓▒░▒██░   ▓██░░▒████░▒████ ▒▄▄   ▒▄▄      
+░ ▒▒▓  ▒ ░ ▒░▒░▒░ ░ ▒░   ▒ ▒ ░░ ▒░ ░░ ▒░  ░▀▀▒  ░▀▀▒     
+  ░ ▒  ▒   ░ ▒ ▒░ ░ ░░   ░ ▒░ ░ ░   ░ ░   ░  ░  ░  ░     
+  ░ ░  ░ ░ ░ ░ ▒     ░   ░ ░    ░     ░      ░     ░     
     ░        ░ ░           ░    ░     ░   ░     ░   "     
 
 
