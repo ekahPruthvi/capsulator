@@ -87,6 +87,8 @@ sed -i -E "s|^title\s+Arch Linux install medium \(.*\)|title    CynageOS Linux i
 
 # AIROOTFS
 cp -r "$BaseDir/iso/bin" "$HOME/cynageiso/cos/airootfs/usr/"
+cp -r "$BaseDir/iso/include" "$HOME/cynageiso/cos/airootfs/usr/"
+cp -r "$BaseDir/iso/lib" "$HOME/cynageiso/cos/airootfs/usr/"
 cp -r "$BaseDir/iso/var" "$HOME/cynageiso/cos/airootfs/"
 
 cd $BaseDir
