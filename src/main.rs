@@ -9,8 +9,14 @@ use std::process::Command;
 use std::cell::Cell;
 use std::rc::Rc;
 use vte4::{Terminal, PtyFlags, TerminalExtManual};
-use gtk4::glib::{SpawnFlags,Pid,Error};
+use gtk4::glib::{SpawnFlags,Pid,Error, MainContext};
 use std::sync::{Arc, atomic::{AtomicBool, Ordering}};
+use signal_hook::consts::signal::*;
+use signal_hook::flag;
+use std::thread;
+use std::time::Duration;
+
+extern crate libc;
 
 fn main() {
     let _ = Command::new("NetworkManager");
@@ -363,6 +369,7 @@ fn build_ui(app: &Application) {
 
         .wifi-entry-pass {
             padding: 5px;
+            padding-left: 10px;
             font-size: 16px;
             border-radius: 0px 0px 20px 20px;
             border: 1px 1px 1px 1px solid rgba(255, 255, 255, 0.16);
@@ -405,7 +412,7 @@ fn build_ui(app: &Application) {
             background-color: rgba(46, 46, 46, 1);
             color: rgba(134, 134, 134, 1);
             border-radius: 15px;
-            box-shadow: rgba(43, 43, 43, 0.4) 0px 0px 0px 2px, rgba(41, 41, 41, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+            box-shadow: rgba(43, 43, 43, 0.2) 0px 0px 0px 2px, rgba(41, 41, 41, 0.17) 0px 4px 6px -1px, rgba(255, 255, 255, 0.04) 0px 1px 0px inset;
         }
 
         button:hover {
@@ -429,6 +436,34 @@ fn build_ui(app: &Application) {
         &css,
         gtk4::STYLE_PROVIDER_PRIORITY_APPLICATION,
     );
+
+    // ---------------------------------------------------------------- SIGNALS
+    let sigrtmin = libc::SIGRTMIN();
+    let sig1 = Arc::new(AtomicBool::new(false));
+    let sig2 = Arc::new(AtomicBool::new(false));
+    let sig3 = Arc::new(AtomicBool::new(false));
+    let sig4 = Arc::new(AtomicBool::new(false));
+
+    let _ = flag::register(sigrtmin as i32, Arc::clone(&sig1));
+    let _ = flag::register(sigrtmin as i32 + 1, Arc::clone(&sig2));
+    let _ = flag::register(sigrtmin as i32 + 2, Arc::clone(&sig3));
+    let _ = flag::register(sigrtmin as i32 + 3, Arc::clone(&sig4));
+
+    gtk4::glib::timeout_add_seconds_local(1, move || {
+        if sig1.swap(false, Ordering::Relaxed) {
+            println!("Received signal 1");
+        }
+        if sig2.swap(false, Ordering::Relaxed) {
+            println!("Received signal 2");
+        }
+        if sig3.swap(false, Ordering::Relaxed) {
+            println!("Received signal 3");
+        }
+        if sig4.swap(false, Ordering::Relaxed) {
+            println!("Received signal 4");
+        }
+        glib::ControlFlow::Continue
+    });
 
     let main_box = GtkBox::new(Orientation::Vertical, 0);
     main_box.set_hexpand(true);
@@ -475,10 +510,10 @@ fn build_ui(app: &Application) {
 
     let wifibox = GtkBox::new(Orientation::Vertical, 5);
     wifibox.set_widget_name("inbox");
-    wifibox.set_vexpand(false);
+    wifibox.set_vexpand(true);
     wifibox.set_hexpand(false);
-    wifibox.set_size_request(500, 300);
-    wifibox.set_valign(gtk4::Align::Center);
+    // wifibox.set_size_request(500, 300);
+    wifibox.set_valign(gtk4::Align::Fill);
     wifibox.set_halign(gtk4::Align::Center);
 
     wifibox.append(&Label::builder()
@@ -716,11 +751,28 @@ fn build_ui(app: &Application) {
     swapentry.set_width_request(400);
     swapentry.set_placeholder_text(Some("Enter Swap path (optional)"));
 
+    let lsblk = Label::new(Some("Loading..."));
+    lsblk.set_wrap(true);
+    lsblk.set_hexpand(true);
+    lsblk.set_width_request(400);
+    lsblk.set_halign(gtk4::Align::Start);
+    lsblk.set_justify(gtk4::Justification::Left);
+    lsblk.set_widget_name("ter_text");
+
+    let partbox = GtkBox::new(Orientation::Vertical, 5);
+    partbox.set_vexpand(true);
+    partbox.set_valign(gtk4::Align::Center);
+    partbox.append(&bootentry);
+    partbox.append(&rootentry);
+    partbox.append(&swapentry);
+    partbox.append(&makepart);
+
+
+    format.append(&lsblk);
+    format.append(&partbox);
+
     let stack_clone = stack.clone();
-    let bootentry_clone = bootentry.clone();
-    let rootentry_clone = rootentry.clone();
-    let swapentry_clone = swapentry.clone();
-    let makepart_clone = makepart.clone();
+    let lsblk_clone = lsblk.clone();
 
     glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
         if stack_clone.visible_child_name() == Some("formatpart".into()) {
@@ -729,26 +781,8 @@ fn build_ui(app: &Application) {
                 .expect("Failed to execute lsblk");
             let output_str = String::from_utf8_lossy(&output.stdout);
 
-            let lsblk = Label::new(Some(&output_str));
+            lsblk_clone.set_text(&output_str);
 
-            lsblk.set_wrap(true);
-            lsblk.set_hexpand(true);
-            lsblk.set_width_request(400);
-            lsblk.set_halign(gtk4::Align::Start);
-            lsblk.set_justify(gtk4::Justification::Left);
-            lsblk.set_widget_name("ter_text");
-
-            let partbox = GtkBox::new(Orientation::Vertical, 5);
-            partbox.set_vexpand(true);
-            partbox.set_valign(gtk4::Align::Center);
-            partbox.append(&bootentry_clone);
-            partbox.append(&rootentry_clone);
-            partbox.append(&swapentry_clone);
-
-            partbox.append(&makepart_clone);
-
-            format.append(&lsblk);
-            format.append(&partbox);
             return glib::ControlFlow::Break;
         }
         glib::ControlFlow::Continue
@@ -775,7 +809,7 @@ fn build_ui(app: &Application) {
         let btpr = bootentry.text().to_string();
         let swppr = swapentry.text().to_string();
         stack_clone.set_visible_child_name("mount");        
-        let argv = vec!["bash", "/usr/bin/archincos.sh", &rtpr, &btpr, &swppr];
+        let argv = vec!["bash", "/usr/bin/archincos.sh && read", &rtpr, &btpr, &swppr];
         terminally_ill(
             &mnt_clone, 
             &stack_clone, 
@@ -799,7 +833,7 @@ fn build_ui(app: &Application) {
     fsgen.set_valign(gtk4::Align::Center);
     fsgen.set_halign(gtk4::Align::Center);
 
-    stack.add_named(&fsgen, Some("generatefs"));
+    // stack.add_named(&fsgen, Some("generatefs"));
 
     let stack_clone = stack.clone();
     let break_flag_clone = break_flag.clone();
