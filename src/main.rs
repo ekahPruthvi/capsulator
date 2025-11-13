@@ -803,14 +803,14 @@ fn build_ui(app: &Application) {
 
     let stack_clone = stack.clone();
     let break_flag_clone = break_flag.clone();
-    let mnt_clone = fsgen.clone();
+    let fsgen_clone = fsgen.clone();
     let drawing_area_clone = drawing_area.clone();
     let info_clone = info.clone();
     glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
         if stack_clone.visible_child_name() == Some("generatefs".into()) {    
             let argv = vec!["bash", "-c", "/usr/bin/cynsetupcos.sh"];
             terminally_ill(
-                &mnt_clone, 
+                &fsgen_clone, 
                 &stack_clone, 
                 argv, 
                 break_flag_clone.clone(), 

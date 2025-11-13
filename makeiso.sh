@@ -100,9 +100,10 @@ echo "Managing permissions and creating the MOTD" && sleep 3s
 echo "cynageOS" > "$HOME/cynageiso/cos/airootfs/etc/hostname"
 
 cat << EOF > $HOME/cynageiso/cos/airootfs/etc/motd
- ░█░░░█░█▀▀░█░░█▀▄░▄▀▀▄░█▀▄▀█░█▀▀░░░▀█▀░▄▀▀▄░░
- ░▀▄█▄▀░█▀▀░█░░█░░░█░░█░█░▀░█░█▀▀░░░░█░░█░░█░░
- ░░▀░▀░░▀▀▀░▀▀░▀▀▀░░▀▀░░▀░░▒▀░▀▀▀░░░░▀░░░▀▀░░░                                                                       
+__________________________________________________________________________________________________________________________________________
+
+██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+                                                                     
                                                       ▄▄█▀▀██▄  ▄█▀▀▀█▄█    
                                                     ▄██▀    ▀██▄██    ▀█    
  ▄██▀██▀██▀   ▀██▀████████▄  ▄█▀██▄  ▄█▀█████ ▄▄█▀████▀      ▀█████▄        
@@ -123,10 +124,17 @@ cat << EOF > $HOME/cynageiso/cos/airootfs/etc/motd
 author: ekahPruthvi <ekahpdp@gmail.com>
 github: https://github.com/ekahPruthvi/cynageOS.git
 
-To begin the cynageOSv5 installation, first connect your device to the 
-internet using a wired Ethernet connection, then type 'capper'. 
-If you are using WiFi, simply type 'capper' to start the installation process.
-or use this live arch image to fix your install
+██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████
+__________________________________________________________________________________________________________________________________________
+
+
+
+To initiate the cynageOSv5 installation, follow these steps:
+
+1. Wired Ethernet Connection: Connect your device to the internet using a wired Ethernet connection. 
+   Then, type 'capper' to begin the installation process.
+2. WiFi Connection: If you're using WiFi, simply type 'capper' to start the installation.
+
 EOF
 
 cat << EOF > $HOME/cynageiso/cos/airootfs/etc/os-release
