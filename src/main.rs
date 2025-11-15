@@ -9,14 +9,8 @@ use std::process::Command;
 use std::cell::Cell;
 use std::rc::Rc;
 use vte4::{Terminal, PtyFlags, TerminalExtManual};
-use gtk4::glib::{SpawnFlags,Pid,Error, MainContext};
+use gtk4::glib::{SpawnFlags,Pid,Error };
 use std::sync::{Arc, atomic::{AtomicBool, Ordering}};
-use signal_hook::consts::signal::*;
-use signal_hook::flag;
-use std::thread;
-use std::time::Duration;
-
-extern crate libc;
 
 fn main() {
     let _ = Command::new("NetworkManager");
@@ -82,6 +76,7 @@ fn terminally_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Ar
     let terminal = Terminal::new();
     terminal.set_vexpand(true);
     terminal.set_hexpand(true);
+    break_flag.set(false);
 
     let break_flag_clone = break_flag.clone();
 
@@ -157,7 +152,6 @@ fn terminally_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Ar
         glib::ControlFlow::Continue
     });
 }
-
 
 fn build_ui(app: &Application) {
     let window = ApplicationWindow::new(app);
@@ -412,7 +406,9 @@ fn build_ui(app: &Application) {
             background-color: rgba(46, 46, 46, 1);
             color: rgba(134, 134, 134, 1);
             border-radius: 15px;
-            box-shadow: rgba(43, 43, 43, 0.2) 0px 0px 0px 2px, rgba(41, 41, 41, 0.17) 0px 4px 6px -1px, rgba(255, 255, 255, 0.04) 0px 1px 0px inset;
+            box-shadow: rgba(43, 43, 43, 0.2) 0px 0px 0px 2px, 
+            rgba(41, 41, 41, 0.17) 0px 4px 6px -1px, 
+            rgba(255, 255, 255, 0.04) 0px 1px 0px inset;
         }
 
         button:hover {
@@ -438,32 +434,6 @@ fn build_ui(app: &Application) {
     );
 
     // ---------------------------------------------------------------- SIGNALS
-    let sigrtmin = libc::SIGRTMIN();
-    let sig1 = Arc::new(AtomicBool::new(false));
-    let sig2 = Arc::new(AtomicBool::new(false));
-    let sig3 = Arc::new(AtomicBool::new(false));
-    let sig4 = Arc::new(AtomicBool::new(false));
-
-    let _ = flag::register(sigrtmin as i32, Arc::clone(&sig1));
-    let _ = flag::register(sigrtmin as i32 + 1, Arc::clone(&sig2));
-    let _ = flag::register(sigrtmin as i32 + 2, Arc::clone(&sig3));
-    let _ = flag::register(sigrtmin as i32 + 3, Arc::clone(&sig4));
-
-    gtk4::glib::timeout_add_seconds_local(1, move || {
-        if sig1.swap(false, Ordering::Relaxed) {
-            println!("Received signal 1");
-        }
-        if sig2.swap(false, Ordering::Relaxed) {
-            println!("Received signal 2");
-        }
-        if sig3.swap(false, Ordering::Relaxed) {
-            println!("Received signal 3");
-        }
-        if sig4.swap(false, Ordering::Relaxed) {
-            println!("Received signal 4");
-        }
-        glib::ControlFlow::Continue
-    });
 
     let main_box = GtkBox::new(Orientation::Vertical, 0);
     main_box.set_hexpand(true);
@@ -799,8 +769,8 @@ fn build_ui(app: &Application) {
 
     stack.add_named(&mount, Some("mount"));
 
-    let stack_clone = stack.clone();
-    let break_flag_clone = break_flag.clone();
+    let stack_clone_6th = stack.clone();
+    let break_flag_clone_6th = break_flag.clone();
     let mnt_clone = mount.clone();
     let drawing_area_clone = drawing_area.clone();
     let info_clone = info.clone();
@@ -808,13 +778,13 @@ fn build_ui(app: &Application) {
         let rtpr = rootentry.text().to_string();
         let btpr = bootentry.text().to_string();
         let swppr = swapentry.text().to_string();
-        stack_clone.set_visible_child_name("mount");        
-        let argv = vec!["bash", "/usr/bin/archincos.sh && read", &rtpr, &btpr, &swppr];
+        stack_clone_6th.set_visible_child_name("mount");        
+        let argv = vec!["bash", "-c", "/usr/bin/archincos.sh", &rtpr, &btpr, &swppr];
         terminally_ill(
             &mnt_clone, 
-            &stack_clone, 
+            &stack_clone_6th, 
             argv, 
-            break_flag_clone.clone(), 
+            break_flag_clone_6th.clone(), 
             "Mounting filesystems", 
             &drawing_area_clone, 
             &info_clone.clone(), 
@@ -822,7 +792,6 @@ fn build_ui(app: &Application) {
             "generatefs"
         );
     });
-
 
     // ---------------------------------------------------------------- 7t page
     let fsgen = GtkBox::new(Orientation::Horizontal, 5);
@@ -833,7 +802,7 @@ fn build_ui(app: &Application) {
     fsgen.set_valign(gtk4::Align::Center);
     fsgen.set_halign(gtk4::Align::Center);
 
-    // stack.add_named(&fsgen, Some("generatefs"));
+    stack.add_named(&fsgen, Some("generatefs"));
 
     let stack_clone = stack.clone();
     let break_flag_clone = break_flag.clone();
@@ -869,14 +838,7 @@ fn build_ui(app: &Application) {
     done.set_halign(gtk4::Align::Center);
 
     stack.add_named(&done, Some("done"));
-    let stack_clone = stack.clone();
-    glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
-        if stack_clone.visible_child_name() == Some("done".into()) {
-            let _ = Command::new("shutdown now");
-            return glib::ControlFlow::Break;
-        }
-        glib::ControlFlow::Continue
-    });
+    done.append(&Label::new(Some("bob")));
 
     // ---------------------------------------------------------------- main box
     stack_box.append(&stack);

@@ -61,7 +61,7 @@ EOF
 
 sleep 2s
 
-read -p "Enter your username: " USERNAME
+read -p "Enter your username (all in small letters): " USERNAME
 read -p "Enter your computer name (hostname): " COMPUTERNAME
 
 if [[ "$USERNAME" == "pdp" || "$USERNAME" == "ekah" ]]; then
@@ -78,15 +78,12 @@ EOF
 
 sleep 2s
 
-elif [[ "$USERNAME" == "chands" || "$USERNAME" == "murgi" || "$USERNAME" == "chandana" ]]; then
+elif [[ "$USERNAME" == "chands" || "$USERNAME" == "murgi" || "$USERNAME" == "chickenswab" ]]; then
     cat << EOF
 
 ░█░░░░█▀▀░█░░█░░▄▀▀▄
 ░█▀▀█░█▀▀░█░░█░░█░░█
 ░▀░░▀░▀▀▀░▀▀░▀▀░░▀▀░
-░▄▀▀▄░█▀▀▄░░▀░░█▀▀▀░░▀░░█▀▀▄░█▀▀▄░█░
-░█░░█░█▄▄▀░░█▀░█░▀▄░░█▀░█░▒█░█▄▄█░█░
-░░▀▀░░▀░▀▀░▀▀▀░▀▀▀▀░▀▀▀░▀░░▀░▀░░▀░▀▀
 ░▄▀▀▄░█▀▀░█▀▀▄░█▀▀▀░█░░░▀░░█▀▀▄░░░░░░░
 ░█▄▄█░█▀▀░█░▒█░█░▀▄░█░░░█▀░█░▒█░░░▄▄░░
 ░█░░░░▀▀▀░▀░░▀░▀▀▀▀░▀▀░▀▀▀░▀░░▀░░░▀▀░░
@@ -187,3 +184,6 @@ arch-chroot /mnt /root/chroot_setup.sh
 
 echo "Cleaning chroot setup script..."
 rm /mnt/root/chroot_setup.sh
+
+pidof cap | xargs kill -34
+/usr/bin/cynsetupcos.sh
