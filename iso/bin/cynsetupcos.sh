@@ -277,6 +277,8 @@ yay -S --needed --noconfirm "${PKGLIST[@]}"
 pacman -U --noconfirm /mnt/root/wlroots0.19-0.19.1-2-x86_64.pkg.tar.zst 
 pacman -U --noconfirm /mnt/root/cage-0.2.0-3-x86_64.pkg.tar.zst 
 
+FIX THISSSS ^^^^
+
 echo "Delisting cage from updates"
 echo "IgnorePkg = cage" | sudo tee -a /mnt/root/etc/pacman.conf
 

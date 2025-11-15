@@ -3,6 +3,8 @@
 # ekahPruthvi <https://github.com/ekahPruthvi>
 # Usage: ./archincos.sh <root_partition> <boot_partition> [swap_partition]
 
+set -x
+
 ROOT="$1"
 BOOT="$2"
 SWAP="$3"
@@ -49,7 +51,7 @@ fi
 
 echo "Detected microcode: $UCODE"
 
-cat << EOF
+cat << 'EOF'
 ░▒█▀▀▀█░▒█▀▀▀░▀▀█▀▀░▀▀█▀▀░▀█▀░▒█▄░▒█░▒█▀▀█
 ░░▀▀▀▄▄░▒█▀▀▀░░▒█░░░░▒█░░░▒█░░▒█▒█▒█░▒█░▄▄
 ░▒█▄▄▄█░▒█▄▄▄░░▒█░░░░▒█░░░▄█▄░▒█░░▀█░▒█▄▄▀
@@ -65,7 +67,7 @@ read -p "Enter your username (all in small letters): " USERNAME
 read -p "Enter your computer name (hostname): " COMPUTERNAME
 
 if [[ "$USERNAME" == "pdp" || "$USERNAME" == "ekah" ]]; then
-    cat << EOF
+    cat <<'EOF'
 
 ░█░░░░█▀▀░█░░█░░▄▀▀▄
 ░█▀▀█░█▀▀░█░░█░░█░░█
@@ -74,12 +76,11 @@ if [[ "$USERNAME" == "pdp" || "$USERNAME" == "ekah" ]]; then
 ░█░░░█▄▄▀░█▀▀░█▄▄█░░█░░█░░█░█▄▄▀░░░▄▄░░
 ░▀▀▀░▀░▀▀░▀▀▀░▀░░▀░░▀░░░▀▀░░▀░▀▀░░░▀▀░░
 
-EOF 
-
-sleep 2s
+EOF
+    sleep 2s
 
 elif [[ "$USERNAME" == "chands" || "$USERNAME" == "murgi" || "$USERNAME" == "chickenswab" ]]; then
-    cat << EOF
+    cat <<'EOF'
 
 ░█░░░░█▀▀░█░░█░░▄▀▀▄
 ░█▀▀█░█▀▀░█░░█░░█░░█
@@ -89,6 +90,7 @@ elif [[ "$USERNAME" == "chands" || "$USERNAME" == "murgi" || "$USERNAME" == "chi
 ░█░░░░▀▀▀░▀░░▀░▀▀▀▀░▀▀░▀▀▀░▀░░▀░░░▀▀░░
 
 EOF
+    sleep 2s
 fi
 
 sleep 2s
@@ -108,6 +110,8 @@ echo "Resulting /mnt/etc/fstab:"
 cat /mnt/etc/fstab
 
 cp /var/lib/cos/backend/wlroots0.19-0.19.1-2-x86_64.pkg.tar.zst /var/lib/cos/backend/cage-0.2.0-3-x86_64.pkg.tar.zst /mnt/root/
+
+FIX HERE ^^^^^^^ get the libraries and put em in teh right place
 
 cat <<EOF > /mnt/root/chroot_setup.sh
 #!/bin/bash

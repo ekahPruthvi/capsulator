@@ -489,6 +489,7 @@ fn build_ui(app: &Application) {
     let info = Label::new(Some("Till cynageOS"));
     info.set_widget_name("info");
     progressbox.append(&info);
+    progressbox.set_visible(false);
 
     let drawing_area = DrawingArea::builder()
         .content_width(40)
@@ -641,6 +642,7 @@ fn build_ui(app: &Application) {
     stack.add_named(&up_box, Some("intro"));
     if is_connected(){
         stack.set_visible_child_name("intro");
+        // progressbox.set_visible(true);
     }
     
     // ---------------------------------------------------------------- 3r page
@@ -659,7 +661,9 @@ fn build_ui(app: &Application) {
     let pacman_clone = pacman.clone();
     let drawing_area_clone = drawing_area.clone();
     let info_clone = info.clone();
+    let progressbox_clone = progressbox.clone();
     start.connect_clicked(move |_| {
+        progressbox_clone.set_visible(true);
         stack_clone.set_visible_child_name("pacman");        
         let argv = vec!["bash", "-c", "sudo pacman -Sy && sudo pacman -Sy archlinux-keyring"];
         terminally_ill(
@@ -676,6 +680,9 @@ fn build_ui(app: &Application) {
     });
 
     stack.add_named(&pacman, Some("pacman"));
+
+    fix wlr in both scripts 
+    and recheck y 6th page and 7th page is not running
 
     // ---------------------------------------------------------------- 4t page
     let part = GtkBox::new(Orientation::Vertical, 5);
