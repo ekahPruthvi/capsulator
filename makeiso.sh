@@ -131,9 +131,10 @@ ________________________________________________________________________________
 
 To initiate the cynageOSv5 installation, follow these steps:
 
-1. Wired Ethernet Connection: Connect your device to the internet using a wired Ethernet connection. 
+1. If Laptop, Please make sure your device has enough battery or connect to a charger.
+2. Wired Ethernet Connection: Connect your device to the internet using a wired Ethernet connection. 
    Then, type 'capper' to begin the installation process.
-2. WiFi Connection: If you're using WiFi, simply type 'capper' to start the installation.
+3. WiFi Connection: If you're using WiFi, simply type 'capper' to start the installation.
 
 EOF
 

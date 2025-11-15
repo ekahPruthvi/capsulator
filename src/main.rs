@@ -78,6 +78,22 @@ fn terminally_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Ar
     terminal.set_hexpand(true);
     break_flag.set(false);
 
+    let fg = gtk4::gdk::RGBA::new(0.4275, 0.4275, 0.4275, 1.0);
+    let bg = gtk4::gdk::RGBA::new(0.7686, 0.7686, 0.7686, 1.0); 
+
+    let palette_owned: Vec<gtk4::gdk::RGBA> = vec![
+        gtk4::gdk::RGBA::new(0.00, 0.40, 0.27, 1.0),
+        gtk4::gdk::RGBA::new(0.00, 0.49, 0.32, 1.0),
+        gtk4::gdk::RGBA::new(0.00, 0.57, 0.38, 1.0),
+        gtk4::gdk::RGBA::new(0.00, 0.66, 0.44, 1.0),
+        gtk4::gdk::RGBA::new(0.00, 0.74, 0.50, 1.0),
+        gtk4::gdk::RGBA::new(0.00, 0.83, 0.55, 1.0),
+        gtk4::gdk::RGBA::new(0.00, 0.91, 0.61, 1.0),
+        gtk4::gdk::RGBA::new(0.00, 1.00, 0.67, 1.0),
+    ];
+    let palette: Vec<&gtk4::gdk::RGBA> = palette_owned.iter().collect();
+    terminal.set_colors(Some(&fg), Some(&bg), &palette);
+
     let break_flag_clone = break_flag.clone();
 
     
@@ -329,7 +345,7 @@ fn build_ui(app: &Application) {
         #inbox-dark {
             border-radius: 25px;
             border: 1px solid rgba(255, 255, 255, 0.16);
-            background-color: rgba(0, 0, 0, 1);
+            background-color: rgba(196, 196, 196, 1);
             padding: 30px 30px 30px 30px;
         }
 
@@ -416,6 +432,14 @@ fn build_ui(app: &Application) {
             color: rgba(255, 255, 255, 1);
         }
 
+        .bob-target { 
+            all: unset;
+            color: white;
+            background-color: rgba(43, 43, 43, 1);
+            padding: 10px;
+            border-radius: 15px;
+        }
+
         #ter_text {
             color: rgba(109, 109, 109, 1);
         }
@@ -482,7 +506,9 @@ fn build_ui(app: &Application) {
     wifibox.set_widget_name("inbox");
     wifibox.set_vexpand(true);
     wifibox.set_hexpand(false);
-    // wifibox.set_size_request(500, 300);
+    // wifibox.set_size_request(300, 300);
+    wifibox.set_margin_end(20);
+    wifibox.set_margin_top(30);
     wifibox.set_valign(gtk4::Align::Fill);
     wifibox.set_halign(gtk4::Align::Center);
 
@@ -704,21 +730,25 @@ fn build_ui(app: &Application) {
         .child(&Label::new(Some("Begin partition formating")))
         .hexpand(true)
         .vexpand(true)
-        .halign(gtk4::Align::Center)
-        .valign(gtk4::Align::Baseline)
-        .margin_bottom(20)
+        .halign(gtk4::Align::End)
+        .valign(gtk4::Align::End)
+        .margin_bottom(10)
+        .margin_top(10)
         .build();
 
     let bootentry = Entry::new();
     bootentry.set_width_request(400);
+    bootentry.set_css_classes(&["bob-target"]);
     bootentry.set_placeholder_text(Some("Enter boot path (/dev/nvme0n1p*)"));
 
     let rootentry = Entry::new();
     rootentry.set_width_request(400);
+    rootentry.set_css_classes(&["bob-target"]);
     rootentry.set_placeholder_text(Some("Enter root path (/dev/nvme0n1p*)"));
 
     let swapentry = Entry::new();
     swapentry.set_width_request(400);
+    swapentry.set_css_classes(&["bob-target"]);
     swapentry.set_placeholder_text(Some("Enter Swap path (optional)"));
 
     let lsblk = Label::new(Some("Loading..."));
@@ -811,7 +841,7 @@ fn build_ui(app: &Application) {
     let info_clone = info.clone();
     glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
         if stack_clone.visible_child_name() == Some("generatefs".into()) {    
-            let argv = vec!["bash", "-c", "/usr/bin/cynsetupcos.sh"];
+            let argv = vec!["bash", "/usr/bin/cynsetupcos.sh"];
             terminally_ill(
                 &fsgen_clone, 
                 &stack_clone, 

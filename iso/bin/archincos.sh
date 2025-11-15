@@ -185,5 +185,3 @@ arch-chroot /mnt /root/chroot_setup.sh
 echo "Cleaning chroot setup script..."
 rm /mnt/root/chroot_setup.sh
 
-pidof cap | xargs kill -34
-/usr/bin/cynsetupcos.sh
