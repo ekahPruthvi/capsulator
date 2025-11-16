@@ -11,6 +11,7 @@ use std::rc::Rc;
 use vte4::{Terminal, PtyFlags, TerminalExtManual};
 use gtk4::glib::{SpawnFlags,Pid,Error };
 use std::sync::{Arc, atomic::{AtomicBool, Ordering}};
+use signal_hook::flag;
 
 fn main() {
     let _ = Command::new("NetworkManager");
@@ -68,7 +69,7 @@ fn is_connected() -> bool {
     stdout.trim() == "connected"
 }
 
-fn terminally_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Arc<AtomicBool>, text: &str, drawing_area: &DrawingArea, info: &Label, percent: f64, next: &str) {
+fn terminally_ill(boxxy: &GtkBox, argv: Vec<&str>) {
     while let Some(child) = boxxy.first_child() {
         boxxy.remove(&child);
     }
@@ -76,7 +77,6 @@ fn terminally_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Ar
     let terminal = Terminal::new();
     terminal.set_vexpand(true);
     terminal.set_hexpand(true);
-    break_flag.set(false);
 
     let fg = gtk4::gdk::RGBA::new(0.4275, 0.4275, 0.4275, 1.0);
     let bg = gtk4::gdk::RGBA::new(0.7686, 0.7686, 0.7686, 1.0); 
@@ -94,9 +94,6 @@ fn terminally_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Ar
     let palette: Vec<&gtk4::gdk::RGBA> = palette_owned.iter().collect();
     terminal.set_colors(Some(&fg), Some(&bg), &palette);
 
-    let break_flag_clone = break_flag.clone();
-
-    
     println!("{:?}", argv);
 
     terminal.spawn_async(
@@ -109,12 +106,10 @@ fn terminally_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Ar
         -1,
         None::<&gtk4::gio::Cancellable>,
         move |res: Result<Pid, Error>| {
-            let break_flag_clone_inner = break_flag_clone.clone();
             match res {
                 Ok(pid) =>  {
                     glib::child_watch_add(pid, move |_pid, status| {
                         println!("Process exited with status {}", status);
-                        break_flag_clone_inner.store(true, Ordering::SeqCst);
                     });
                 },
                 Err(e) => eprintln!("Failed to spawn terminal process: {}", e),
@@ -123,7 +118,9 @@ fn terminally_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Ar
     );
 
     boxxy.append(&terminal);
+}
 
+fn signally(text: &str, drawing_area: &DrawingArea, info: &Label) {
     info.set_text(text);
 
     let progress_values = vec![
@@ -133,7 +130,6 @@ fn terminally_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Ar
         70.0, 75.0, 80.0, 85.0,
         90.0, 95.0, 100.0,
     ];
-    let current_index = Rc::new(Cell::new(0));
 
     let progress = Rc::new(Cell::new(progress_values[0]));
 
@@ -142,23 +138,12 @@ fn terminally_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Ar
         draw_circle_progress(cr, progress_clone.get());
     });
 
+    let current_index = Rc::new(Cell::new(0));
     let drawing_area_clone = drawing_area.clone();
     let current_index_clone = current_index.clone();
     let progress_clone2 = progress.clone();
-    let break_flag_clone = break_flag.clone();
 
-    let next_one = next.to_string();
-    let stack_clone = stack.clone();
-    let info_clone = info.clone();
     glib::timeout_add_local(std::time::Duration::from_millis(70), move || {
-        if break_flag_clone.load(Ordering::SeqCst) {
-            info_clone.set_text("Till CynageOS");
-            stack_clone.set_visible_child_name(&next_one);
-            drawing_area_clone.set_draw_func(move |_, cr, _, _| {
-                draw_circle_progress(cr, percent);
-            });
-            return glib::ControlFlow::Break;
-        }
         let idx = (current_index_clone.get() + 1) % progress_values.len();
         current_index_clone.set(idx);
         progress_clone2.set(progress_values[idx]);
@@ -166,8 +151,20 @@ fn terminally_ill(boxxy: &GtkBox, stack: &Stack, argv: Vec<&str>, break_flag: Ar
         drawing_area_clone.queue_draw();
 
         glib::ControlFlow::Continue
+    }); 
+}
+
+fn signally_terminato(stack: &Stack, percent: f64, next: &str, drawing_area: &DrawingArea, info: &Label){
+    let drawing_area_clone = drawing_area.clone();
+
+    let next_one = next.to_string();
+    info.set_text("Till CynageOS");
+    stack.set_visible_child_name(&next_one);
+    drawing_area_clone.set_draw_func(move |_, cr, _, _| {
+        draw_circle_progress(cr, percent);
     });
 }
+
 
 fn build_ui(app: &Application) {
     let window = ApplicationWindow::new(app);
@@ -457,8 +454,7 @@ fn build_ui(app: &Application) {
         gtk4::STYLE_PROVIDER_PRIORITY_APPLICATION,
     );
 
-    // ---------------------------------------------------------------- SIGNALS
-
+    // ---------------------------------------------------------------- MAINS
     let main_box = GtkBox::new(Orientation::Vertical, 0);
     main_box.set_hexpand(true);
     main_box.set_vexpand(true);
@@ -642,7 +638,6 @@ fn build_ui(app: &Application) {
     stack.add_named(&up_box, Some("intro"));
     if is_connected(){
         stack.set_visible_child_name("intro");
-        // progressbox.set_visible(true);
     }
     
     // ---------------------------------------------------------------- 3r page
@@ -657,7 +652,6 @@ fn build_ui(app: &Application) {
 
 
     let stack_clone = stack.clone();
-    let break_flag_clone = break_flag.clone();
     let pacman_clone = pacman.clone();
     let drawing_area_clone = drawing_area.clone();
     let info_clone = info.clone();
@@ -665,24 +659,18 @@ fn build_ui(app: &Application) {
     start.connect_clicked(move |_| {
         progressbox_clone.set_visible(true);
         stack_clone.set_visible_child_name("pacman");        
-        let argv = vec!["bash", "-c", "sudo pacman -Sy && sudo pacman -Sy archlinux-keyring"];
+        let argv = vec!["bash", "-c", "sudo pacman -Sy && sudo pacman -Sy archlinux-keyring || pidof cap | xargs kill -34"];
+        signally( "updating pacman keyrings", &drawing_area_clone, &info_clone);
         terminally_ill(
-            &pacman_clone, 
-            &stack_clone, 
-            argv, 
-            break_flag_clone.clone(), 
-            "updating pacman keyrings", 
-            &drawing_area_clone, 
-            &info_clone.clone(), 
-            5.0,
-            "partinfo"
+            &pacman_clone,
+            argv
         );
     });
 
     stack.add_named(&pacman, Some("pacman"));
 
-    fix wlr in both scripts 
-    and recheck y 6th page and 7th page is not running
+    // fix wlr in both scripts 
+    // and recheck y 6th page and 7th page is not running
 
     // ---------------------------------------------------------------- 4t page
     let part = GtkBox::new(Orientation::Vertical, 5);
@@ -702,16 +690,10 @@ fn build_ui(app: &Application) {
         if stack_clone_4th.visible_child_name() == Some("partinfo".into()) {
             break_flag_clone_4th.set(false);
             let argv = vec!["bash"];
+            signally("Creating partitions", &drawing_area_clone, &info_clone);
             terminally_ill(
-                &part, 
-                &stack_clone_4th, 
-                argv, 
-                break_flag_clone_4th.clone(), 
-                "Creating partitions", 
-                &drawing_area_clone, 
-                &info_clone.clone(), 
-                10.0, 
-                "formatpart"
+                &part,
+                argv
             );
             let part_label = Label::builder()
                 .label("use <lsblk> to check the disks\nand <cfdisk> to create partitions\nMake atleast 800M for boot (EFI partiton)\nand swap (linux swap) if desired and rest for root (linux filesystem)\nswap is optional and <exit> after finished")
@@ -817,16 +799,10 @@ fn build_ui(app: &Application) {
         let swppr = swapentry.text().to_string();
         stack_clone_6th.set_visible_child_name("mount");        
         let argv = vec!["bash", "-c", "/usr/bin/archincos.sh", &rtpr, &btpr, &swppr];
+        signally("mounting filesystems", &drawing_area_clone, &info_clone);
         terminally_ill(
-            &mnt_clone, 
-            &stack_clone_6th, 
-            argv, 
-            break_flag_clone_6th.clone(), 
-            "Mounting filesystems", 
-            &drawing_area_clone, 
-            &info_clone.clone(), 
-            50.0,
-            "generatefs"
+            &mnt_clone,
+            argv
         );
     });
 
@@ -849,16 +825,10 @@ fn build_ui(app: &Application) {
     glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
         if stack_clone.visible_child_name() == Some("generatefs".into()) {    
             let argv = vec!["bash", "/usr/bin/cynsetupcos.sh"];
+            signally("Installing Dependencies", &drawing_area_clone, &info_clone);
             terminally_ill(
-                &fsgen_clone, 
-                &stack_clone, 
-                argv, 
-                break_flag_clone.clone(), 
-                "Settingup Your install", 
-                &drawing_area_clone, 
-                &info_clone.clone(), 
-                90.0,
-                "done"
+                &fsgen_clone,
+                argv
             );
             return glib::ControlFlow::Break;
         }
@@ -877,7 +847,7 @@ fn build_ui(app: &Application) {
     stack.add_named(&done, Some("done"));
     done.append(&Label::new(Some("bob")));
 
-    // ---------------------------------------------------------------- main box
+    // ---------------------------------------------------------------- m
     stack_box.append(&stack);
     main_box.append(&stack_box);
     
@@ -931,5 +901,35 @@ fn build_ui(app: &Application) {
 
     window.set_child(Some(&overlay));
     window.show();
+
+
+    // ---------------------------------------------------------------- SIGNALS
+    let sigrtmin = libc::SIGRTMIN();
+    let sig1 = Arc::new(AtomicBool::new(false));
+    let sig2 = Arc::new(AtomicBool::new(false));
+    let sig3 = Arc::new(AtomicBool::new(false));
+    let sig4 = Arc::new(AtomicBool::new(false));
+
+    let _ = flag::register(sigrtmin as i32, Arc::clone(&sig1));
+    let _ = flag::register(sigrtmin as i32 + 1, Arc::clone(&sig2));
+    let _ = flag::register(sigrtmin as i32 + 2, Arc::clone(&sig3));
+    let _ = flag::register(sigrtmin as i32 + 3, Arc::clone(&sig4));
+
+    gtk4::glib::timeout_add_seconds_local(1, move || {
+    if sig1.swap(false, Ordering::Relaxed) {
+        println!("Received signal 1 for termination and move to page 4");
+        signally_terminato(&stack, 10.0, "partinfo", &drawing_area, &info);
+    }
+    if sig2.swap(false, Ordering::Relaxed) {
+        println!("Received signal 2");
+    }
+    if sig3.swap(false, Ordering::Relaxed) {
+        println!("Received signal 3");
+    }
+    if sig4.swap(false, Ordering::Relaxed) {
+        println!("Received signal 4");
+    }
+    glib::ControlFlow::Continue
+    });
 
 }
