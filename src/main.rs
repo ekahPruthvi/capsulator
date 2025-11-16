@@ -681,6 +681,7 @@ fn build_ui(app: &Application) {
     part.set_valign(gtk4::Align::Center);
     part.set_halign(gtk4::Align::Center);
     stack.add_named(&part, Some("partinfo"));
+    part.append(&Label::new(Some("Loading...")));
 
     let stack_clone_4th = stack.clone();
     let break_flag_clone_4th = break_flag.clone();
@@ -789,7 +790,6 @@ fn build_ui(app: &Application) {
     stack.add_named(&mount, Some("mount"));
 
     let stack_clone_6th = stack.clone();
-    let break_flag_clone_6th = break_flag.clone();
     let mnt_clone = mount.clone();
     let drawing_area_clone = drawing_area.clone();
     let info_clone = info.clone();
@@ -818,7 +818,6 @@ fn build_ui(app: &Application) {
     stack.add_named(&fsgen, Some("generatefs"));
 
     let stack_clone = stack.clone();
-    let break_flag_clone = break_flag.clone();
     let fsgen_clone = fsgen.clone();
     let drawing_area_clone = drawing_area.clone();
     let info_clone = info.clone();
