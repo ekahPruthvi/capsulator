@@ -669,8 +669,8 @@ fn build_ui(app: &Application) {
 
     stack.add_named(&pacman, Some("pacman"));
 
-    fix all info shiiiii
-    and recheck y 6th page and 7th page is not running
+    // fix all info shiiiii
+    // and recheck y 6th page and 7th page is not running
 
     // ---------------------------------------------------------------- 4t page
     let part = GtkBox::new(Orientation::Vertical, 5);
@@ -682,6 +682,15 @@ fn build_ui(app: &Application) {
     part.set_halign(gtk4::Align::Center);
     stack.add_named(&part, Some("partinfo"));
     part.append(&Label::new(Some("Loading...")));
+
+    let to_formartpart = Button::builder()
+        .label("\"I Hav Followed All The Instructions :)\"")
+        .vexpand(true)
+        .hexpand(true)
+        .valign(gtk4::Align::End)
+        .halign(gtk4::Align::Fill)
+        .build();
+
 
     let stack_clone_4th = stack.clone();
     let break_flag_clone_4th = break_flag.clone();
@@ -697,10 +706,11 @@ fn build_ui(app: &Application) {
                 argv
             );
             let part_label = Label::builder()
-                .label("use <lsblk> to check the disks\nand <cfdisk> to create partitions\nMake atleast 800M for boot (EFI partiton)\nand swap (linux swap) if desired and rest for root (linux filesystem)\nswap is optional and <exit> after finished")
+                .label("use <lsblk> to check the disks\nand <cfdisk> to create partitions\nMake atleast 800M for boot (EFI partiton)\nand swap (linux swap) if desired and rest for root (linux filesystem)\nswap is optional.\nPlease refer to capsulator github (https://github.com/ekahPruthvi/capsulator/blob/main/README.md)")
                 .name("ter_text") 
                 .build();
             part.append(&part_label);
+            part.append(&to_formartpart);
             return glib::ControlFlow::Break;
         }
         glib::ControlFlow::Continue
@@ -920,7 +930,8 @@ fn build_ui(app: &Application) {
         signally_terminato(&stack, 10.0, "partinfo", &drawing_area, &info);
     }
     if sig2.swap(false, Ordering::Relaxed) {
-        println!("Received signal 2");
+        println!("Received signal 2 for terminaltion and move to page 5");
+        signally_terminato(&stack, 20.0, "formatpart", &drawing_area, &info);
     }
     if sig3.swap(false, Ordering::Relaxed) {
         println!("Received signal 3");
