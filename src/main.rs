@@ -669,8 +669,8 @@ fn build_ui(app: &Application) {
 
     stack.add_named(&pacman, Some("pacman"));
 
-    // fix wlr in both scripts 
-    // and recheck y 6th page and 7th page is not running
+    fix all info shiiiii
+    and recheck y 6th page and 7th page is not running
 
     // ---------------------------------------------------------------- 4t page
     let part = GtkBox::new(Orientation::Vertical, 5);
