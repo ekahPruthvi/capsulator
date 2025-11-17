@@ -413,6 +413,10 @@ fn build_ui(app: &Application) {
             margin-top: 2px;
         }
 
+        #error {
+            color: rgba(255, 99, 99, 1);
+        }
+
         button {
             all:unset;
             padding: 10px;
@@ -590,6 +594,7 @@ fn build_ui(app: &Application) {
     };
 
     let error = Label::new(Some(""));
+    error.set_widget_name("error");
     wifibox.append(&error);
 
     let refresh = Button::builder()
@@ -652,7 +657,6 @@ fn build_ui(app: &Application) {
     pacman.set_valign(gtk4::Align::Center);
     pacman.set_halign(gtk4::Align::Center);
 
-
     let stack_clone = stack.clone();
     let pacman_clone = pacman.clone();
     let drawing_area_clone = drawing_area.clone();
@@ -661,7 +665,7 @@ fn build_ui(app: &Application) {
     start.connect_clicked(move |_| {
         progressbox_clone.set_visible(true);
         stack_clone.set_visible_child_name("pacman");        
-        let argv = vec!["bash", "-c", "sudo pacman -Sy && sudo pacman -Sy archlinux-keyring || pidof cap | xargs kill -34"];
+        let argv = vec!["bash", "-c", "sudo pacman -Sy && sudo pacman -Sy archlinux-keyring && pidof cap | xargs kill -34"];
         signally( "updating pacman keyrings", &drawing_area_clone, &info_clone);
         terminally_ill(
             &pacman_clone,
@@ -813,7 +817,7 @@ fn build_ui(app: &Application) {
         let btpr = bootentry.text().to_string();
         let swppr = swapentry.text().to_string();
         stack_clone_6th.set_visible_child_name("mount");        
-        let argv = vec!["bash", "-c", "/usr/bin/archincos.sh", &rtpr, &btpr, &swppr];
+        let argv = vec!["/usr/bin/archincos.sh", &rtpr, &btpr, &swppr];
         signally("mounting filesystems", &drawing_area_clone, &info_clone);
         terminally_ill(
             &mnt_clone,
