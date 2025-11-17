@@ -671,9 +671,6 @@ fn build_ui(app: &Application) {
 
     stack.add_named(&pacman, Some("pacman"));
 
-    // fix all info shiiiii
-    // and recheck y 6th page and 7th page is not running
-
     // ---------------------------------------------------------------- 4t page
     let part = GtkBox::new(Orientation::Vertical, 5);
     part.set_widget_name("inbox-dark");
@@ -816,7 +813,7 @@ fn build_ui(app: &Application) {
         let btpr = bootentry.text().to_string();
         let swppr = swapentry.text().to_string();
         stack_clone_6th.set_visible_child_name("mount");        
-        let argv = vec!["bash", "-c", "iso/bin/archincos.sh", &rtpr, &btpr, &swppr];
+        let argv = vec!["bash", "-c", "/usr/bin/archincos.sh", &rtpr, &btpr, &swppr];
         signally("mounting filesystems", &drawing_area_clone, &info_clone);
         terminally_ill(
             &mnt_clone,
@@ -841,7 +838,7 @@ fn build_ui(app: &Application) {
     let info_clone = info.clone();
     glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
         if stack_clone.visible_child_name() == Some("generatefs".into()) {    
-            let argv = vec!["bash", "iso/bin/cynsetupcos.sh"];
+            let argv = vec!["bash", "/usr/bin/cynsetupcos.sh"];
             signally("Installing Dependencies", &drawing_area_clone, &info_clone);
             terminally_ill(
                 &fsgen_clone,
