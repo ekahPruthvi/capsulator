@@ -435,6 +435,8 @@ fn build_ui(app: &Application) {
             background-color: rgba(43, 43, 43, 1);
             padding: 10px;
             border-radius: 15px;
+            caret-color: white;
+            outline: none;
         }
 
         #ter_text {
@@ -691,6 +693,12 @@ fn build_ui(app: &Application) {
         .halign(gtk4::Align::Fill)
         .build();
 
+    to_formartpart.connect_clicked(move |_|{
+        let _ = Command::new("bash")
+        .arg("-c")
+        .arg("pidof cap | xargs kill -35")
+        .spawn();
+    });
 
     let stack_clone_4th = stack.clone();
     let break_flag_clone_4th = break_flag.clone();
@@ -700,7 +708,7 @@ fn build_ui(app: &Application) {
         if stack_clone_4th.visible_child_name() == Some("partinfo".into()) {
             break_flag_clone_4th.set(false);
             let argv = vec!["bash"];
-            signally("Creating partitions", &drawing_area_clone, &info_clone);
+            signally("Waiting for user", &drawing_area_clone, &info_clone);
             terminally_ill(
                 &part,
                 argv
@@ -808,7 +816,7 @@ fn build_ui(app: &Application) {
         let btpr = bootentry.text().to_string();
         let swppr = swapentry.text().to_string();
         stack_clone_6th.set_visible_child_name("mount");        
-        let argv = vec!["bash", "-c", "/usr/bin/archincos.sh", &rtpr, &btpr, &swppr];
+        let argv = vec!["bash", "-c", "iso/bin/archincos.sh", &rtpr, &btpr, &swppr];
         signally("mounting filesystems", &drawing_area_clone, &info_clone);
         terminally_ill(
             &mnt_clone,
@@ -833,7 +841,7 @@ fn build_ui(app: &Application) {
     let info_clone = info.clone();
     glib::timeout_add_local(std::time::Duration::from_secs(2), move ||{
         if stack_clone.visible_child_name() == Some("generatefs".into()) {    
-            let argv = vec!["bash", "/usr/bin/cynsetupcos.sh"];
+            let argv = vec!["bash", "iso/bin/cynsetupcos.sh"];
             signally("Installing Dependencies", &drawing_area_clone, &info_clone);
             terminally_ill(
                 &fsgen_clone,
@@ -849,7 +857,6 @@ fn build_ui(app: &Application) {
     done.set_widget_name("inbox-dark");
     done.set_vexpand(true);
     done.set_hexpand(true);
-    // done.set_size_request(900, 500);
     done.set_valign(gtk4::Align::Center);
     done.set_halign(gtk4::Align::Center);
 
@@ -918,28 +925,52 @@ fn build_ui(app: &Application) {
     let sig2 = Arc::new(AtomicBool::new(false));
     let sig3 = Arc::new(AtomicBool::new(false));
     let sig4 = Arc::new(AtomicBool::new(false));
+    let sig5 = Arc::new(AtomicBool::new(false));
+    let sig6 = Arc::new(AtomicBool::new(false));
+    let sig7 = Arc::new(AtomicBool::new(false));
+    let sig8 = Arc::new(AtomicBool::new(false));
 
     let _ = flag::register(sigrtmin as i32, Arc::clone(&sig1));
     let _ = flag::register(sigrtmin as i32 + 1, Arc::clone(&sig2));
     let _ = flag::register(sigrtmin as i32 + 2, Arc::clone(&sig3));
     let _ = flag::register(sigrtmin as i32 + 3, Arc::clone(&sig4));
+    let _ = flag::register(sigrtmin as i32 + 4, Arc::clone(&sig5));
+    let _ = flag::register(sigrtmin as i32 + 5, Arc::clone(&sig6));
+    let _ = flag::register(sigrtmin as i32 + 6, Arc::clone(&sig7));
+    let _ = flag::register(sigrtmin as i32 + 7, Arc::clone(&sig8));
 
     gtk4::glib::timeout_add_seconds_local(1, move || {
-    if sig1.swap(false, Ordering::Relaxed) {
-        println!("Received signal 1 for termination and move to page 4");
-        signally_terminato(&stack, 10.0, "partinfo", &drawing_area, &info);
-    }
-    if sig2.swap(false, Ordering::Relaxed) {
-        println!("Received signal 2 for terminaltion and move to page 5");
-        signally_terminato(&stack, 20.0, "formatpart", &drawing_area, &info);
-    }
-    if sig3.swap(false, Ordering::Relaxed) {
-        println!("Received signal 3");
-    }
-    if sig4.swap(false, Ordering::Relaxed) {
-        println!("Received signal 4");
-    }
-    glib::ControlFlow::Continue
+        if sig1.swap(false, Ordering::Relaxed) {
+            println!("Received signal 34 for termination and move to page 4");
+            signally_terminato(&stack, 10.0, "partinfo", &drawing_area, &info);
+        }
+        if sig2.swap(false, Ordering::Relaxed) {
+            println!("Received signal 35 for terminaltion and move to page 5");
+            signally_terminato(&stack, 20.0, "formatpart", &drawing_area, &info);
+        }
+        if sig3.swap(false, Ordering::Relaxed) {
+            println!("Received signal 36 for terminaltion and move to page 6");
+            signally_terminato(&stack, 30.0, "generatefs", &drawing_area, &info);
+        }
+        if sig4.swap(false, Ordering::Relaxed) {
+            println!("Received signal 37 for info text change");
+            info.set_text("Setting User Details");
+        }
+        if sig5.swap(false, Ordering::Relaxed) {
+            println!("Received signal 38 for info text change");
+            info.set_text("Theming CynageOS");
+        }
+        if sig6.swap(false, Ordering::Relaxed) {
+            println!("Received signal 39 for termination and move to last page");
+            signally_terminato(&stack, 100.0, "done", &drawing_area, &info);
+        }
+        if sig7.swap(false, Ordering::Relaxed) {
+            println!("Received signal 40 ");
+        }
+        if sig8.swap(false, Ordering::Relaxed) {
+            println!("Received signal 41 ");
+        }
+        glib::ControlFlow::Continue
     });
 
 }
