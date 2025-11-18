@@ -108,10 +108,10 @@ genfstab -U /mnt >> /mnt/etc/fstab
 echo "Resulting /mnt/etc/fstab:"
 cat /mnt/etc/fstab
 
-cp -pa /usr/bin/cage  /mnt/root/usr/bin/
-cp -par /usr/include/wlroots-0.18 /mnt/root/usr/include/
-cp -pa /usr/lib/libwlroots-0.18.so /mnt/root/usr/lib/
-cp -pa /usr/lib/wlroots-0.18.pc /mnt/root/usr/lib/
+cp -pa /usr/bin/cage  /mnt/usr/bin/
+cp -par /usr/include/wlroots-0.18 /mnt/usr/include/
+cp -pa /usr/lib/libwlroots-0.18.so /mnt/usr/lib/
+cp -pa /usr/lib/wlroots-0.18.pc /mnt/usr/lib/
 
 cat <<EOF > /mnt/root/chroot_setup.sh
 #!/bin/bash
