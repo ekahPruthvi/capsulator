@@ -70,6 +70,7 @@ pango
 gdk-pixbuf2
 cairo
 glib2
+git
 EOF
 
 echo "Appeding required packages" && sleep 3s

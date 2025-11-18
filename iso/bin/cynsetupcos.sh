@@ -274,9 +274,6 @@ mesa
 
 yay -S --needed --noconfirm "${PKGLIST[@]}"
 
-echo "Delisting cage from updates"
-echo "IgnorePkg = cage" | sudo tee -a /mnt/root/etc/pacman.conf
-
 cat << EOF
 
 ░▒█▀▀█░█▀▀░▀█▀░▀█▀░░▀░░█▀▀▄░█▀▀▀
@@ -309,7 +306,7 @@ cat << EOF
 ░░░░▒█░░░█▀▀█░█▀▀░█░▀░█░░█▀░█░▒█░█░▀▄░░░▄▄░░
 ░░░░▒█░░░▀░░▀░▀▀▀░▀░░▒▀░▀▀▀░▀░░▀░▀▀▀▀░░░▀▀░░
 
-# EOF
+EOF
 
 sleep 1s
 pidof cap | xargs kill -38
