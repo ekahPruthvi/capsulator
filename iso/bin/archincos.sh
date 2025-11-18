@@ -94,11 +94,10 @@ fi
 
 sleep 2s
 
-
 LOCALE=$(cat /usr/share/i18n/SUPPORTED | fzf | cut -d ' ' -f1)
 echo "Selected locale: $LOCALE"
 
-BOOTLOADER_NAME="cynageOS"
+BOOTLOADER_NAME="cynageOSv5"
 
 echo "Pacstrapping base system..."
 pacstrap -i /mnt base base-devel linux linux-firmware git sudo htop $UCODE nano fzf vim bluez bluez-utils networkmanager
@@ -112,6 +111,7 @@ cp -pa /usr/bin/cage  /mnt/usr/bin/
 cp -par /usr/include/wlroots-0.18 /mnt/usr/include/
 cp -pa /usr/lib/libwlroots-0.18.so /mnt/usr/lib/
 cp -pa /usr/lib/wlroots-0.18.pc /mnt/usr/lib/
+cp -pa /etc/os-release /mnt/etc/os-release
 
 cat <<EOF > /mnt/root/chroot_setup.sh
 #!/bin/bash
@@ -175,6 +175,8 @@ grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=$BOOTLOAD
 
 echo "Enabling OS prober..."
 echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
+
+sed -i -E -e "s|^GRUB_DISTRIBUTOR=.*|GRUB_DISTRIBUTOR=\"$BOOTLOADER_NAME\"|" "/etc/default/grub"
 
 echo "Generating GRUB config..."
 grub-mkconfig -o /boot/grub/grub.cfg

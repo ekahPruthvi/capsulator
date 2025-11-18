@@ -24,7 +24,7 @@ sed -i -E \
   -e "s|^iso_application=.*|iso_application=\"$new_iso_application\"|" \
   "$PROFILEDEF"
 
-new_entries='  \[\"/usr/bin/capper\"\]=\"0:0:755\"\
+new_entries='  \[\"/usr/bin/capper\"\]=\"0:0:755\"\ m,
   \[\"/usr/bin/cap\"\]=\"0:0:755\"\
   \[\"/usr/bin/archincos.sh\"\]=\"0:0:755\"\
   \[\"/usr/bin/cage\"\]=\"0:0:755\"\
