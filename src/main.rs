@@ -450,6 +450,11 @@ fn build_ui(app: &Application) {
         #info {
             color: rgba(0, 0, 0, 1);
         }
+
+        #done-text {
+            font-size: 20px;
+            font-weight: 900;
+        }
         
         ",
     );
@@ -855,14 +860,20 @@ fn build_ui(app: &Application) {
 
     // ---------------------------------------------------------------- 7t page
     let done = GtkBox::new(Orientation::Horizontal, 5);
-    done.set_widget_name("inbox-dark");
+    // done.set_widget_name("inbox-dark");
     done.set_vexpand(true);
     done.set_hexpand(true);
     done.set_valign(gtk4::Align::Center);
     done.set_halign(gtk4::Align::Center);
 
     stack.add_named(&done, Some("done"));
-    done.append(&Label::new(Some("bob")));
+    done.append(
+        &Label::builder()
+            .name("done-txt")
+            .label("CynageOS Has completed Installing :)")
+            .build()
+    );
+
 
     // ---------------------------------------------------------------- m
     stack_box.append(&stack);
