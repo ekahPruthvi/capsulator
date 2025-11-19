@@ -451,9 +451,40 @@ fn build_ui(app: &Application) {
             color: rgba(0, 0, 0, 1);
         }
 
-        #done-text {
-            font-size: 20px;
-            font-weight: 900;
+        .caps {
+            min-height: 40px;
+            padding: 10px;
+            padding-right: 15px; 
+            padding-left: 15px;
+            border-radius: 50px;
+            background: rgba(92, 92, 92, 0.25);
+            border: 0.5px solid rgba(255, 255, 255, 0.18);
+            box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, 
+                rgba(0, 0, 0, 0.12) 0px -12px 30px, 
+                rgba(0, 0, 0, 0.12) 0px 4px 6px, 
+                rgba(0, 0, 0, 0.17) 0px 12px 13px, 
+                rgba(0, 0, 0, 0.09) 0px -3px 5px;
+        }
+
+        .caps-btn {
+            all: unset;
+            background: rgba(0, 0, 0, 0);
+            padding: 10px;
+            padding-right: 30px;
+            padding-left: 30px;
+            border-radius: 50px;
+            margin: 10px;
+            transform: scale(1.0);
+            transition: background 0.2s ease, transform 0.2s ease;
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 1);
+        }
+
+        #done-txt {
+            color: rgba(219, 219, 219, 1);
+            font-size: 30px;
+            font-weight: 200;
         }
         
         ",
@@ -859,21 +890,51 @@ fn build_ui(app: &Application) {
     });
 
     // ---------------------------------------------------------------- 7t page
-    let done = GtkBox::new(Orientation::Horizontal, 5);
+    let done = GtkBox::new(Orientation::Vertical, 5);
     // done.set_widget_name("inbox-dark");
     done.set_vexpand(true);
     done.set_hexpand(true);
     done.set_valign(gtk4::Align::Center);
-    done.set_halign(gtk4::Align::Center);
+    done.set_halign(gtk4::Align::Fill);
 
     stack.add_named(&done, Some("done"));
+    let capsule = GtkBox::new(Orientation::Horizontal, 5);
+    capsule.set_css_classes(&["caps"]);
+    capsule.set_halign(gtk4::Align::Center);
+
+    
+
     done.append(
         &Label::builder()
             .name("done-txt")
-            .label("CynageOS Has completed Installing :)")
+            .label("INSTALLATION COMPLETE")
+            .margin_bottom(50)
             .build()
     );
 
+    done.append(&capsule);
+    let shut = Button::builder()
+        .css_classes(["caps-btn","def"])
+        .label("ShutDown")
+        .build();
+    let re = Button::builder()
+        .css_classes(["caps-btn"])
+        .label("Restart and use COS")
+        .build();
+    capsule.append(&shut);
+    capsule.append(&re);
+    
+    shut.connect_clicked(move |_|{
+        let _ = Command::new("systemctl")            
+            .arg("poweroff")
+            .spawn();
+    });
+
+    re.connect_clicked(move |_|{
+        let _ = Command::new("systemctl")
+            .arg("reboot")
+            .spawn();
+    });  
 
     // ---------------------------------------------------------------- m
     stack_box.append(&stack);
