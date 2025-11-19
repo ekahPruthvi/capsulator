@@ -28,6 +28,16 @@ new_entries='  \[\"/usr/bin/capper\"\]=\"0:0:755\"\ m,
   \[\"/usr/bin/cap\"\]=\"0:0:755\"\
   \[\"/usr/bin/archincos.sh\"\]=\"0:0:755\"\
   \[\"/usr/bin/cage\"\]=\"0:0:755\"\
+  \[\"/usr/bin/altDot\"\]=\"0:0:755\"\
+  \[\"/usr/bin/batt_low\"\]=\"0:0:755\"\
+  \[\"/usr/bin/calibrate\"\]=\"0:0:755\"\
+  \[\"/usr/bin/capsule\"\]=\"0:0:755\"\
+  \[\"/usr/bin/clipper\"\]=\"0:0:755\"\
+  \[\"/usr/bin/cynagectl\"\]=\"0:0:755\"\
+  \[\"/usr/bin/octobacillus\"\]=\"0:0:755\"\
+  \[\"/usr/bin/octobacilluscus\"\]=\"0:0:755\"\
+  \[\"/usr/bin/terminatee\"\]=\"0:0:755\"\
+  \[\"/usr/bin/welp\"\]=\"0:0:755\"\
   \[\"/usr/bin/cynsetupcos.sh\"\]=\"0:0:755\"'
 
 sed -i "/file_permissions=(/,/)/ {

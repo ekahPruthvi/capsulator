@@ -902,8 +902,6 @@ fn build_ui(app: &Application) {
     capsule.set_css_classes(&["caps"]);
     capsule.set_halign(gtk4::Align::Center);
 
-    
-
     done.append(
         &Label::builder()
             .name("done-txt")
@@ -923,7 +921,7 @@ fn build_ui(app: &Application) {
         .build();
     capsule.append(&shut);
     capsule.append(&re);
-    
+
     shut.connect_clicked(move |_|{
         let _ = Command::new("systemctl")            
             .arg("poweroff")

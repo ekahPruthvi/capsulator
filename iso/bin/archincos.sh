@@ -108,6 +108,16 @@ echo "Resulting /mnt/etc/fstab:"
 cat /mnt/etc/fstab
 
 cp -pa /usr/bin/cage  /mnt/usr/bin/
+cp -pa /usr/bin/altDot  /mnt/usr/bin/
+cp -pa /usr/bin/batt_low  /mnt/usr/bin/
+cp -pa /usr/bin/calibrate  /mnt/usr/bin/
+cp -pa /usr/bin/capsule  /mnt/usr/bin/
+cp -pa /usr/bin/clipper  /mnt/usr/bin/
+cp -pa /usr/bin/cynagectl  /mnt/usr/bin/
+cp -pa /usr/bin/octobacillus  /mnt/usr/bin/
+cp -pa /usr/bin/octobacilluscus  /mnt/usr/bin/
+cp -pa /usr/bin/terminatee  /mnt/usr/bin/
+cp -pa /usr/bin/welp /mnt/usr/bin/
 cp -par /usr/include/wlroots-0.18 /mnt/usr/include/
 cp -pa /usr/lib/libwlroots-0.18.so /mnt/usr/lib/
 cp -pa /usr/lib/wlroots-0.18.pc /mnt/usr/lib/
