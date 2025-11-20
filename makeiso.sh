@@ -25,26 +25,28 @@ sed -i -E \
   "$PROFILEDEF"
 
 cat > /tmp/new_entries.txt <<'EOF'
-["/usr/bin/capper"]="0:0:755"
-["/usr/bin/cap"]="0:0:755"
-["/usr/bin/archincos.sh"]="0:0:755"
-["/usr/bin/cage"]="0:0:755"
-["/usr/bin/altDot"]="0:0:755"
-["/usr/bin/batt_low"]="0:0:755"
-["/usr/bin/calibrate"]="0:0:755"
-["/usr/bin/capsule"]="0:0:755"
-["/usr/bin/clipper"]="0:0:755"
-["/usr/bin/cynagectl"]="0:0:755"
-["/usr/bin/octobacillus"]="0:0:755"
-["/usr/bin/octobacilluscus"]="0:0:755"
-["/usr/bin/terminatee"]="0:0:755"
-["/usr/bin/welp"]="0:0:755"
-["/usr/bin/welp_runner.sh"]="0:0:755"
-["/usr/bin/cynsetupcos.sh"]="0:0:755"
+  ["/usr/bin/capper"]="0:0:755"
+  ["/usr/bin/cap"]="0:0:755"
+  ["/usr/bin/archincos.sh"]="0:0:755"
+  ["/usr/bin/cage"]="0:0:755"
+  ["/usr/bin/altDot"]="0:0:755"
+  ["/usr/bin/batt_low"]="0:0:755"
+  ["/usr/bin/calibrate"]="0:0:755"
+  ["/usr/bin/capsule"]="0:0:755"
+  ["/usr/bin/clipper"]="0:0:755"
+  ["/usr/bin/cynagectl"]="0:0:755"
+  ["/usr/bin/octobacillus"]="0:0:755"
+  ["/usr/bin/octobacilluscus"]="0:0:755"
+  ["/usr/bin/terminatee"]="0:0:755"
+  ["/usr/bin/welp"]="0:0:755"
+  ["/usr/bin/welp_runner.sh"]="0:0:755"
+  ["/usr/bin/cynsetupcos.sh"]="0:0:755"
+)
 EOF
 
 sed -i "/file_permissions=(/,/)/ {
-  /)/r /tmp/new_entries.txt
+  /)/ r /tmp/new_entries.txt
+  /)/ d
 }" "$PROFILEDEF"
 
 rm /tmp/new_entries.txt
