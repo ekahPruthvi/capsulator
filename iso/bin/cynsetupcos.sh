@@ -84,6 +84,8 @@ if ! command -v yay &>/dev/null; then
   cd -
 fi
 
+su 
+
 DRIVERS=()
 if lspci | grep -E -i 'nvidia|geforce'; then
     DRIVERS=(nvidia-open nvidia-utils lib32-nvidia-utils)
@@ -273,7 +275,10 @@ mesa
 "${DRIVERS[@]}"
 )
 
-yay -S --needed --noconfirm "${PKGLIST[@]}"
+while ! yay -S --needed --noconfirm "${PKGLIST[@]}"; do
+  echo "insialling failed, retrying..."
+done
+
 
 cat << EOF
 

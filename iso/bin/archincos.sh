@@ -100,7 +100,9 @@ echo "Selected locale: $LOCALE"
 BOOTLOADER_NAME="cynageOSv5"
 
 echo "Pacstrapping base system..."
-pacstrap -i /mnt base base-devel linux linux-firmware git sudo htop $UCODE nano fzf vim bluez bluez-utils networkmanager
+while ! pacstrap -i /mnt base base-devel linux linux-firmware git sudo htop $UCODE nano fzf vim bluez bluez-utils networkmanager; do
+  echo "pacstrap failed, retrying..."
+done
 
 echo "Generating fstab..."
 genfstab -U /mnt >> /mnt/etc/fstab
@@ -133,7 +135,7 @@ printf "░▒█▀▀▄░▒█▀▀▄░▒█▀▀▀░█▀▀▄░
 ░▒█▄▄▀░▒█░▒█░▒█▄▄▄▒█░▒█░░▒█░░░▄█▄░▒█░░▀█░▒█▄▄▀\n
 ░▒█░▒█░▒█▀▀▀█░▒█▀▀▀░▒█▀▀▄░░░░░
 ░▒█░▒█░░▀▀▀▄▄░▒█▀▀▀░▒█▄▄▀░▄▄░░
-░░▀▄▄▀░▒█▄▄▄█░▒█▄▄▄░▒█░▒█░▀▀░░"
+░░▀▄▄▀░▒█▄▄▄█░▒█▄▄▄░▒█░▒█░▀▀░░\n"
 
 echo "Setting root password..."
 until passwd; do
@@ -156,7 +158,19 @@ echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 echo "Switching to user $USERNAME..."
 su - $USERNAME -c 'sudo pacman -Syu'
 
-echo "Configuring timezone..."
+cat <<'EOF'
+
+░▒█▀▀▄░▒█▀▀▀█░▒█▄░▒█░▒█▀▀▀░▀█▀░▒█▀▀█░▒█░▒█░▒█▀▀▄░▀█▀░▒█▄░▒█░▒█▀▀█░
+░▒█░░░░▒█░░▒█░▒█▒█▒█░▒█▀▀░░▒█░░▒█░▄▄░▒█░▒█░▒█▄▄▀░▒█░░▒█▒█▒█░▒█░▄▄░
+░▒█▄▄▀░▒█▄▄▄█░▒█░░▀█░▒█░░░░▄█▄░▒█▄▄▀░░▀▄▄▀░▒█░▒█░▄█▄░▒█░░▀█░▒█▄▄▀░
+
+░▀▀█▀▀░▀█▀░▒█▀▄▀█░▒█▀▀▀░▒█▀▀▀█░▒█▀▀▀█░▒█▄░▒█░▒█▀▀▀░░░░░░░
+░░▒█░░░▒█░░▒█▒█▒█░▒█▀▀▀░░▄▄▄▀▀░▒█░░▒█░▒█▒█▒█░▒█▀▀▀░░░▄▄░░
+░░▒█░░░▄█▄░▒█░░▒█░▒█▄▄▄░▒█▄▄▄█░▒█▄▄▄█░▒█░░▀█░▒█▄▄▄░░░▀▀░░
+
+press return to select timezone
+EOF
+read
 ZONE=\$(find /usr/share/zoneinfo/ -type f | sed 's|/usr/share/zoneinfo/||' | fzf)
 ln -sf "/usr/share/zoneinfo/\$ZONE" /etc/localtime
 
@@ -178,6 +192,8 @@ cat <<EOT > /etc/hosts
 127.0.0.1   localhost
 ::1         localhost
 127.0.1.1   $COMPUTERNAME.localdomain $COMPUTERNAME
+
+su - $USERNAME
 EOT
 
 echo "Installing bootloader tools..."
