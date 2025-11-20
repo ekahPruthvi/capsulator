@@ -310,6 +310,7 @@ ExecStart=/opt/welp_runner.sh
 WantedBy=multi-user.target
 EOF
 
+sudo systemctl enable welp.service
 
 cat << EOF
 

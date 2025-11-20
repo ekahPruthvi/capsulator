@@ -24,27 +24,30 @@ sed -i -E \
   -e "s|^iso_application=.*|iso_application=\"$new_iso_application\"|" \
   "$PROFILEDEF"
 
-new_entries='  \[\"/usr/bin/capper\"\]=\"0:0:755\"\ m,
-  \[\"/usr/bin/cap\"\]=\"0:0:755\"\
-  \[\"/usr/bin/archincos.sh\"\]=\"0:0:755\"\
-  \[\"/usr/bin/cage\"\]=\"0:0:755\"\
-  \[\"/usr/bin/altDot\"\]=\"0:0:755\"\
-  \[\"/usr/bin/batt_low\"\]=\"0:0:755\"\
-  \[\"/usr/bin/calibrate\"\]=\"0:0:755\"\
-  \[\"/usr/bin/capsule\"\]=\"0:0:755\"\
-  \[\"/usr/bin/clipper\"\]=\"0:0:755\"\
-  \[\"/usr/bin/cynagectl\"\]=\"0:0:755\"\
-  \[\"/usr/bin/octobacillus\"\]=\"0:0:755\"\
-  \[\"/usr/bin/octobacilluscus\"\]=\"0:0:755\"\
-  \[\"/usr/bin/terminatee\"\]=\"0:0:755\"\
-  \[\"/usr/bin/welp\"\]=\"0:0:755\"\
-  \[\"/usr/bin/welp_runner.sh\"\]=\"0:0:755\"\
-  \[\"/usr/bin/cynsetupcos.sh\"\]=\"0:0:755\"'
+cat > /tmp/new_entries.txt <<'EOF'
+["/usr/bin/capper"]="0:0:755"
+["/usr/bin/cap"]="0:0:755"
+["/usr/bin/archincos.sh"]="0:0:755"
+["/usr/bin/cage"]="0:0:755"
+["/usr/bin/altDot"]="0:0:755"
+["/usr/bin/batt_low"]="0:0:755"
+["/usr/bin/calibrate"]="0:0:755"
+["/usr/bin/capsule"]="0:0:755"
+["/usr/bin/clipper"]="0:0:755"
+["/usr/bin/cynagectl"]="0:0:755"
+["/usr/bin/octobacillus"]="0:0:755"
+["/usr/bin/octobacilluscus"]="0:0:755"
+["/usr/bin/terminatee"]="0:0:755"
+["/usr/bin/welp"]="0:0:755"
+["/usr/bin/welp_runner.sh"]="0:0:755"
+["/usr/bin/cynsetupcos.sh"]="0:0:755"
+EOF
 
 sed -i "/file_permissions=(/,/)/ {
-  /)/ i\\
-$new_entries
+  /)/r /tmp/new_entries.txt
 }" "$PROFILEDEF"
+
+rm /tmp/new_entries.txt
 
 echo "Adding entries to file_permissions in $PROFILEDEF" && sleep 3s
 
