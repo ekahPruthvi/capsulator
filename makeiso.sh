@@ -87,6 +87,7 @@ gdk-pixbuf2
 cairo
 glib2
 git
+fzf
 EOF
 
 echo "Appeding required packages" && sleep 3s
