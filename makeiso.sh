@@ -38,6 +38,7 @@ new_entries='  \[\"/usr/bin/capper\"\]=\"0:0:755\"\ m,
   \[\"/usr/bin/octobacilluscus\"\]=\"0:0:755\"\
   \[\"/usr/bin/terminatee\"\]=\"0:0:755\"\
   \[\"/usr/bin/welp\"\]=\"0:0:755\"\
+  \[\"/usr/bin/welp_runner.sh\"\]=\"0:0:755\"\
   \[\"/usr/bin/cynsetupcos.sh\"\]=\"0:0:755\"'
 
 sed -i "/file_permissions=(/,/)/ {

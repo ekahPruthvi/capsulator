@@ -122,6 +122,7 @@ cp -par /usr/include/wlroots-0.18 /mnt/usr/include/
 cp -pa /usr/lib/libwlroots-0.18.so /mnt/usr/lib/
 cp -pa /usr/lib/wlroots-0.18.pc /mnt/usr/lib/
 cp -pa /etc/os-release /mnt/etc/os-release
+cp -pa /usr/bin/welp_runner.sh /mnt/opt/
 
 cat <<EOF > /mnt/root/chroot_setup.sh
 #!/bin/bash
@@ -187,6 +188,7 @@ echo "Enabling OS prober..."
 echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub
 
 sed -i -E -e "s|^GRUB_DISTRIBUTOR=.*|GRUB_DISTRIBUTOR=\"$BOOTLOADER_NAME\"|" "/etc/default/grub"
+
 
 echo "Generating GRUB config..."
 grub-mkconfig -o /boot/grub/grub.cfg

@@ -242,6 +242,7 @@ xorg-xvinfo
 xorg-xwd
 xorg-xwininfo
 xorg-xwud
+zen-browser
 zsh-autosuggestions-git
 zsh-syntax-highlighting-git
 zsh-theme-powerlevel10k-git
@@ -294,6 +295,20 @@ cat << EOF
 
 EOF
 
+sed -i -E -e "s|^command = .*|command = \"cage -m last -s /usr/bin/octobacillus\"|" "/etc/greetd/config.toml"
+systemctl enable greetd.service
+
+cat << EOF > $HOME//etc/systemd/system/welp.service
+[Unit]
+Description=Welcome application for First boot
+
+[Service]
+Type=oneshot
+ExecStart=/opt/welp_runner.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
 
 cat << EOF
