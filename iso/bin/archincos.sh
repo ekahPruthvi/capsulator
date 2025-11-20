@@ -158,8 +158,8 @@ echo "%wheel ALL=(ALL:ALL) NOPASSWD: ALL" >> /etc/sudoers
 echo "Switching to user $USERNAME..."
 su - $USERNAME -c 'sudo pacman -Syu'
 
-cat <<'EOF'
 
+printf "
 ░▒█▀▀▄░▒█▀▀▀█░▒█▄░▒█░▒█▀▀▀░▀█▀░▒█▀▀█░▒█░▒█░▒█▀▀▄░▀█▀░▒█▄░▒█░▒█▀▀█░
 ░▒█░░░░▒█░░▒█░▒█▒█▒█░▒█▀▀░░▒█░░▒█░▄▄░▒█░▒█░▒█▄▄▀░▒█░░▒█▒█▒█░▒█░▄▄░
 ░▒█▄▄▀░▒█▄▄▄█░▒█░░▀█░▒█░░░░▄█▄░▒█▄▄▀░░▀▄▄▀░▒█░▒█░▄█▄░▒█░░▀█░▒█▄▄▀░
@@ -169,7 +169,8 @@ cat <<'EOF'
 ░░▒█░░░▄█▄░▒█░░▒█░▒█▄▄▄░▒█▄▄▄█░▒█▄▄▄█░▒█░░▀█░▒█▄▄▄░░░▀▀░░
 
 press return to select timezone
-EOF
+
+"
 read
 ZONE=\$(find /usr/share/zoneinfo/ -type f | sed 's|/usr/share/zoneinfo/||' | fzf)
 ln -sf "/usr/share/zoneinfo/\$ZONE" /etc/localtime
@@ -192,8 +193,6 @@ cat <<EOT > /etc/hosts
 127.0.0.1   localhost
 ::1         localhost
 127.0.1.1   $COMPUTERNAME.localdomain $COMPUTERNAME
-
-su - $USERNAME
 EOT
 
 echo "Installing bootloader tools..."
@@ -215,6 +214,8 @@ systemctl enable NetworkManager
 
 echo "Finished inside chroot."
 sed -i '/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/s/^/# /' /etc/sudoers
+
+su - $USERNAME
 EOF
 
 chmod +x /mnt/root/chroot_setup.sh
