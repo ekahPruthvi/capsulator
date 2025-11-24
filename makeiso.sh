@@ -4,7 +4,6 @@ BaseDir="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 
 mkdir -p $HOME/cynageiso
 cp -r /usr/share/archiso/configs/releng $HOME/cynageiso/cos/
-cp /etc/os-release $HOME/cynageiso/cos/airootfs/etc/os-release
 
 # PROFILEDEF.SH
 PROFILEDEF="$HOME/cynageiso/cos/profiledef.sh"
@@ -25,7 +24,7 @@ sed -i -E \
   "$PROFILEDEF"
 
 cat > /tmp/new_entries.txt <<'EOF'
-  ["/usr/bin/capper"]="0:0:755"
+  ["/usr/bin/inmepls"]="0:0:755"
   ["/usr/bin/cap"]="0:0:755"
   ["/usr/bin/archincos.sh"]="0:0:755"
   ["/usr/bin/cage"]="0:0:755"
@@ -151,8 +150,8 @@ To initiate the cynageOSv5 installation, follow these steps:
 
 1. If Laptop, Please make sure your device has enough battery or connect to a charger.
 2. Wired Ethernet Connection: Connect your device to the internet using a wired Ethernet connection. 
-   Then, type 'capper' to begin the installation process.
-3. WiFi Connection: If you're using WiFi, simply type 'capper' to start the installation.
+   Then, type 'inmepls' to begin the installation process.
+3. WiFi Connection: If you're using WiFi, simply type 'inmepls' to start the installation.
 
 EOF
 

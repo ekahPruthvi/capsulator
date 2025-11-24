@@ -77,15 +77,6 @@ EOF
 
 sleep 2s
 
-if ! command -v yay &>/dev/null; then
-  git clone https://aur.archlinux.org/yay.git /tmp/yay
-  cd /tmp/yay
-  makepkg -si --noconfirm
-  cd -
-fi
-
-su 
-
 DRIVERS=()
 if lspci | grep -E -i 'nvidia|geforce'; then
     DRIVERS=(nvidia-open nvidia-utils lib32-nvidia-utils)

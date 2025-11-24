@@ -50,6 +50,7 @@ fi
 echo "Detected microcode: $UCODE"
 
 cat << 'EOF'
+
 ░▒█▀▀▀█░▒█▀▀▀░▀▀█▀▀░▀▀█▀▀░▀█▀░▒█▄░▒█░▒█▀▀█
 ░░▀▀▀▄▄░▒█▀▀▀░░▒█░░░░▒█░░░▒█░░▒█▒█▒█░▒█░▄▄
 ░▒█▄▄▄█░▒█▄▄▄░░▒█░░░░▒█░░░▄█▄░▒█░░▀█░▒█▄▄▀
@@ -95,6 +96,7 @@ fi
 sleep 2s
 
 printf "
+
 ░▒█▀▀▄░▒█▀▀▀█░▒█▄░▒█░▒█▀▀▀░▀█▀░▒█▀▀█░▒█░▒█░▒█▀▀▄░▀█▀░▒█▄░▒█░▒█▀▀█░
 ░▒█░░░░▒█░░▒█░▒█▒█▒█░▒█▀▀░░▒█░░▒█░▄▄░▒█░▒█░▒█▄▄▀░▒█░░▒█▒█▒█░▒█░▄▄░
 ░▒█▄▄▀░▒█▄▄▄█░▒█░░▀█░▒█░░░░▄█▄░▒█▄▄▀░░▀▄▄▀░▒█░▒█░▄█▄░▒█░░▀█░▒█▄▄▀░
@@ -110,7 +112,7 @@ read
 LOCALE=$(cat /usr/share/i18n/SUPPORTED | fzf | cut -d ' ' -f1)
 echo "Selected locale: $LOCALE"
 
-BOOTLOADER_NAME="cynageOSv5"
+BOOTLOADER_NAME="cynageOS"
 
 echo "Pacstrapping base system..."
 while ! pacstrap -i /mnt base base-devel linux linux-firmware git sudo htop $UCODE nano fzf vim bluez bluez-utils networkmanager; do
@@ -143,7 +145,8 @@ cat <<EOF > /mnt/root/chroot_setup.sh
 #!/bin/bash
 set -e
 
-printf "░▒█▀▀▄░▒█▀▀▄░▒█▀▀▀░█▀▀▄░▀▀█▀▀░▀█▀░▒█▄░▒█░▒█▀▀█
+printf "
+░▒█▀▀▄░▒█▀▀▄░▒█▀▀▀░█▀▀▄░▀▀█▀▀░▀█▀░▒█▄░▒█░▒█▀▀█
 ░▒█░░░░▒█▄▄▀░▒█▀▀▀▒█▄▄█░░▒█░░░▒█░░▒█▒█▒█░▒█░▄▄
 ░▒█▄▄▀░▒█░▒█░▒█▄▄▄▒█░▒█░░▒█░░░▄█▄░▒█░░▀█░▒█▄▄▀\n
 ░▒█░▒█░▒█▀▀▀█░▒█▀▀▀░▒█▀▀▄░░░░░
@@ -173,6 +176,7 @@ su - $USERNAME -c 'sudo pacman -Syu'
 
 
 printf "
+
 ░▒█▀▀▄░▒█▀▀▀█░▒█▄░▒█░▒█▀▀▀░▀█▀░▒█▀▀█░▒█░▒█░▒█▀▀▄░▀█▀░▒█▄░▒█░▒█▀▀█░
 ░▒█░░░░▒█░░▒█░▒█▒█▒█░▒█▀▀░░▒█░░▒█░▄▄░▒█░▒█░▒█▄▄▀░▒█░░▒█▒█▒█░▒█░▄▄░
 ░▒█▄▄▀░▒█▄▄▄█░▒█░░▀█░▒█░░░░▄█▄░▒█▄▄▀░░▀▄▄▀░▒█░▒█░▄█▄░▒█░░▀█░▒█▄▄▀░
@@ -228,7 +232,12 @@ systemctl enable NetworkManager
 echo "Finished inside chroot."
 sed -i '/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/s/^/# /' /etc/sudoers
 
-su - $USERNAME
+if ! command -v yay &>/dev/null; then
+  git clone https://aur.archlinux.org/yay.git /tmp/yay
+  cd /tmp/yay
+  su - $USERNAME -c 'makepkg -si --noconfirm'
+  cd -
+fi
 EOF
 
 chmod +x /mnt/root/chroot_setup.sh
