@@ -1,7 +1,7 @@
 use gtk4::glib::property::PropertySet;
 use gtk4::{
     glib, prelude::*, Application, ApplicationWindow, Box as GtkBox, Button, CssProvider, DrawingArea, Entry, Label, ScrolledWindow, 
-    Orientation, Overlay, Stack, Picture
+    Orientation, Overlay, Stack, Picture, EventControllerKey
 };
 use gtk4::gdk::Display;
 use gtk4_layer_shell::{LayerShell, Layer, Edge};
@@ -183,6 +183,16 @@ fn build_ui(app: &Application) {
     ] {
         window.set_anchor(edge, anchor);
     }
+
+    let key_controller = EventControllerKey::new();
+    let app_clone = app.clone();
+    key_controller.connect_key_pressed(move |_, keyval, _, _| {
+        if keyval == gtk4::gdk::Key::Escape {
+            app_clone.quit();
+        }
+        gtk4::glib::Propagation::Stop
+    });
+    window.add_controller(key_controller);
 
     let css = CssProvider::new();
     css.load_from_data(

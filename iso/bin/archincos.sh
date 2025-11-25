@@ -229,15 +229,13 @@ echo "Enabling system services..."
 systemctl enable bluetooth
 systemctl enable NetworkManager
 
-echo "Finished inside chroot."
 sed -i '/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/s/^/# /' /etc/sudoers
 
 if ! command -v yay &>/dev/null; then
-  git clone https://aur.archlinux.org/yay.git /tmp/yay
-  cd /tmp/yay
-  su - $USERNAME -c 'makepkg -si --noconfirm'
-  cd -
+  su - $USERNAME -c 'git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm'
 fi
+
+echo "Finished inside chroot."
 EOF
 
 chmod +x /mnt/root/chroot_setup.sh

@@ -294,7 +294,7 @@ EOF
 sed -i -E -e "s|^command = .*|command = \"cage -m last -s /usr/bin/octobacillus\"|" "/etc/greetd/config.toml"
 systemctl enable greetd.service
 
-cat << EOF > $HOME//etc/systemd/system/welp.service
+cat << EOF > /etc/systemd/system/welp.service
 [Unit]
 Description=Welcome application for First boot
 
