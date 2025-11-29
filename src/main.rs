@@ -12,6 +12,8 @@ use vte4::{Terminal, PtyFlags, TerminalExtManual};
 use gtk4::glib::{SpawnFlags,Pid,Error };
 use std::sync::{Arc, atomic::{AtomicBool, Ordering}};
 use signal_hook::flag;
+use std::collections::HashSet;
+use std::cell::RefCell;
 
 fn main() {
     let _ = Command::new("NetworkManager");
@@ -186,8 +188,11 @@ fn build_ui(app: &Application) {
 
     let key_controller = EventControllerKey::new();
     let app_clone = app.clone();
+    let pressed_keys = RefCell::new(HashSet::new());
     key_controller.connect_key_pressed(move |_, keyval, _, _| {
-        if keyval == gtk4::gdk::Key::Escape {
+        pressed_keys.borrow_mut().insert(keyval);
+        let keys = pressed_keys.borrow();
+        if keys.contains(&gtk4::gdk::Key::Escape) && keys.contains(&gtk4::gdk::Key::_1) {
             app_clone.quit();
         }
         gtk4::glib::Propagation::Stop

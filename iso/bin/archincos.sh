@@ -115,7 +115,7 @@ echo "Selected locale: $LOCALE"
 BOOTLOADER_NAME="cynageOS"
 
 echo "Pacstrapping base system..."
-while ! pacstrap -i /mnt base base-devel linux linux-firmware git sudo htop $UCODE nano fzf vim bluez bluez-utils networkmanager; do
+while ! pacstrap -i /mnt base base-devel linux linux-firmware git sudo htop $UCODE nano fzf go vim bluez bluez-utils networkmanager; do
   echo "pacstrap failed, retrying..."
 done
 
