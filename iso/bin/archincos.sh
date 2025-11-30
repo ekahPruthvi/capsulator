@@ -66,6 +66,8 @@ pidof cap | xargs kill -37
 read -p "Enter your username (all in small letters): " USERNAME
 read -p "Enter your computer name (hostname): " COMPUTERNAME
 
+echo "$USERNAME" > bob.txt
+
 if [[ "$USERNAME" == "pdp" || "$USERNAME" == "ekah" ]]; then
     cat <<'EOF'
 
@@ -140,6 +142,7 @@ cp -pa /usr/lib/libwlroots-0.18.so /mnt/usr/lib/
 cp -pa /usr/lib/wlroots-0.18.pc /mnt/usr/lib/
 cp -pa /etc/os-release /mnt/etc/os-release
 cp -pa /usr/bin/welp_runner.sh /mnt/opt/
+cp -pa /var/lib/cos/yay-12.5.3-1-x86_64.pkg.tar.zst /mnt/root/
 
 cat <<EOF > /mnt/root/chroot_setup.sh
 #!/bin/bash
@@ -231,16 +234,15 @@ systemctl enable NetworkManager
 
 sed -i '/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/s/^/# /' /etc/sudoers
 
-if ! command -v yay &>/dev/null; then
-  su - $USERNAME -c 'git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm'
-fi
+chmod 777 /root/yay-12.5.3-1-x86_64.pkg.tar.zst
+pacman -U /root/yay-12.5.3-1-x86_64.pkg.tar.zst
 
 echo "Finished inside chroot."
 EOF
 
 chmod +x /mnt/root/chroot_setup.sh
 
-echo "Entering chroot to complete setup..."
+echo "Entering chroot to complete Arch setup..."
 arch-chroot /mnt /root/chroot_setup.sh
 
 echo "Cleaning chroot setup script..."

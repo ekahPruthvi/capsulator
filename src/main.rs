@@ -627,6 +627,7 @@ fn build_ui(app: &Application) {
             let error_clone_inner = error_clone.clone();
             let stack_clone = stack.clone();
             pass.connect_activate(move |entry| {
+                error_clone_inner.set_text("connecting...");
                 let password = entry.text();
                 let status = Command::new("nmcli")
                     .args(&["device", "wifi", "connect", &ssid_for_connecting, "password", &password])
