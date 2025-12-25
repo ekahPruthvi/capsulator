@@ -141,7 +141,6 @@ cp -par /usr/include/wlroots-0.18 /mnt/usr/include/
 cp -pa /usr/lib/libwlroots-0.18.so /mnt/usr/lib/
 cp -pa /usr/lib/wlroots-0.18.pc /mnt/usr/lib/
 cp -pa /etc/os-release /mnt/etc/os-release
-cp -pa /usr/bin/welp_runner.sh /mnt/opt/
 cp -pa /var/lib/cos/yay-12.5.3-1-x86_64.pkg.tar.zst /mnt/root/
 
 cat <<EOF > /mnt/root/chroot_setup.sh
