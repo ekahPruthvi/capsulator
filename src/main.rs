@@ -58,7 +58,6 @@ fn draw_circle_progress(cr: &gtk4::cairo::Context, percent: f64) {
     let angle = percent / 100.0 * 2.0 * std::f64::consts::PI;
     cr.arc(center_x, center_y, radius, -std::f64::consts::PI / 2.0, angle - std::f64::consts::PI / 2.0);
     let _ = cr.stroke();
-
 }
 
 fn is_connected() -> bool {
